@@ -9,7 +9,7 @@
 import requests # para requisições http
 import json # para gerar JSON a partir de objetos do Python
 from bs4 import BeautifulSoup # BeautifulSoup é uma biblioteca Python de extração de dados de arquivos HTML e XML.
-from google.colab import files #importei esse pacote para fazer o download do arquivo JSON gerado
+# from google.colab import files #importei esse pacote para fazer o download do arquivo JSON gerado
 
 
 requisicaoDePagina = requests.get('https://ndmais.com.br/florianopolis/')
@@ -41,7 +41,7 @@ noticia_nr = 1
 for noticia in noticias:
 
   #encontra nas tags do HTMO título, resumo e onde está publicada cada uma das noticias, e joga para as respectivas variáveis
-  titulo = noticia.find("h2", {"class" : "title-text"})
+  titulo = noticia.find("a", {"class" : "title-text"})
   resumo = noticia.find("p", {"class" : "resume"})
   onde = noticia.find("a", {"class" : "hat"})
   
@@ -77,9 +77,9 @@ print(' '.join(map(str, resposta)))
 
 
 # Converte os objetos Pyhton em objeto JSON e exporta para o noticias.json
-with open('noticias.json', 'w') as arquivo:
-  arquivo.write(str(json.dumps(resposta, indent=4)))
-print("Created Json File")
+# with open('noticias.json', 'w') as arquivo:
+  # arquivo.write(str(json.dumps(resposta, indent=4)))
 
-#faz o download usando a boblioteca do Colab
-files.download('noticias.json')
+with open('noticias.json', 'w', encoding='utf-8') as arquivo:
+    json.dump(resposta, arquivo, indent=4, ensure_ascii=False)
+print("Created Json File")
