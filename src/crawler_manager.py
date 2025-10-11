@@ -27,9 +27,9 @@ class CrawlerManager(Observer):
     
     def run(self):
         # Creates all scrapers
-        imdb_scraper = IMDBScraper(self.imdb_url_queue)
-        lettr_scraper = LettrScraper(self.lettr_url_queue)
-        rott_scraper = RottScraper(self.rott_url_queue)
+        imdb_scraper = IMDBScraper(self.imdb_url_queue, self.storage)
+        lettr_scraper = LettrScraper(self.lettr_url_queue, self.storage)
+        rott_scraper = RottScraper(self.rott_url_queue, self.storage)
         
         # Creates a thread for each scraper
         imdb_thread = threading.Thread(target=imdb_scraper.run)
