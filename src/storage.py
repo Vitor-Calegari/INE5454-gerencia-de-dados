@@ -6,6 +6,7 @@ from threading import Lock
 class Storage(Observed):
     
     def __init__(self, threshold: int = 1000) -> None:
+        super().__init__()
         self.scrapers = {}
         self.threshold = threshold
         self._lock = Lock()
