@@ -1,0 +1,148 @@
+from src.data_structures.review import Review
+from src.data_structures.plataform import Plataform
+
+
+class Movie:
+    def __init__(self) -> None:
+        self.url = ""
+        self.title = ""
+        self.genres = []
+        self.release_date_theater = ""
+        self.release_date_streaming = ""
+        self.synopsis = ""
+        self.length = ""
+        self.directors = []
+        self.cast = []
+        self.platforms = []
+        self.content_rating = ""
+        self.crit_avr_rating = 0
+        self.crit_reviews = []
+        self.usr_avr_rating = 0
+        self.usr_reviews = []
+    
+    # Getters -----------------------
+    def get_title(self) -> str:
+        return self.title
+
+    def get_url(self) -> str:
+        return self.url
+    
+    def get_genres(self) -> list:
+        return self.genres
+    
+    def get_release_date_theater(self) -> str:
+        return self.release_date_theater
+    
+    def get_release_date_streaming(self) -> str:
+        return self.release_date_streaming
+    
+    def get_synopsis(self) -> str:
+        return self.synopsis
+    
+    def get_length(self) -> str:
+        return self.length
+    
+    def get_directors(self) -> list:
+        return self.directors
+    
+    def get_cast(self) -> list:
+        return self.cast
+    
+    def get_platforms(self) -> list:
+        return self.platforms
+    
+    def get_content_rating(self) -> str:
+        return self.content_rating
+    
+    def get_crit_avr_rating(self) -> float:
+        return self.crit_avr_rating
+    
+    def get_crit_reviews(self) -> list:
+        return self.crit_reviews
+    
+    def get_usr_avr_rating(self) -> float:
+        return self.usr_avr_rating
+    
+    def get_usr_reviews(self) -> list:
+        return self.usr_reviews
+    
+    # Setters -----------------------
+    def set_title(self, title: str) -> None:
+        self.title = title
+
+    def set_url(self, url: str) -> None:
+        self.url = url
+    
+    def set_genres(self, genres: list) -> None:
+        self.genres = genres
+    
+    def set_release_date_theater(self, release_date_theater: str) -> None:
+        self.release_date_theater = release_date_theater
+    
+    def set_release_date_streaming(self, release_date_streaming: str) -> None:
+        self.release_date_streaming = release_date_streaming
+    
+    def set_synopsis(self, synopsis: str) -> None:
+        self.synopsis = synopsis
+    
+    def set_length(self, length: str) -> None:
+        self.length = length
+    
+    def set_directors(self, directors: list) -> None:
+        self.directors = directors
+    
+    def set_cast(self, cast: list) -> None:
+        self.cast = cast
+    
+    def set_platforms(self, platforms: list) -> None:
+        self.platforms = platforms
+    
+    def set_content_rating(self, content_rating: str) -> None:
+        self.content_rating = content_rating
+    
+    def set_crit_avr_rating(self, rating: float) -> None:
+        self.crit_avr_rating = rating
+    
+    def set_crit_reviews(self, reviews: list) -> None:
+        self.crit_reviews = reviews
+    
+    def set_usr_avr_rating(self, rating: float) -> None:
+        self.usr_avr_rating = rating
+    
+    def set_usr_reviews(self, reviews: list) -> None:
+        self.usr_reviews = reviews
+
+    # List insertion methods
+    def add_genre(self, genre: str) -> None:
+        self.genres.append(genre)
+
+    def add_cast_member(self, cast_member: str) -> None:
+        self.cast.append(cast_member)
+
+    def add_platform(self, platform: Plataform) -> None:
+        self.platforms.append(platform)
+
+    def add_critic_review(self, review: Review) -> None:
+        self.crit_reviews.append(review)
+
+    def add_user_review(self, review: Review) -> None:
+        self.usr_reviews.append(review)
+    
+    def add_director(self, director: str) -> None:
+        self.directors.append(director)
+    
+    # String representation
+    def __str__(self) -> str:
+        return (f"{self.title}:\n"
+                f"-URL: {self.url}\n"
+                f"-Genres: {', '.join(self.genres)}\n"
+                f"-Release Date (Theater): {self.release_date_theater}\n"
+                f"-Release Date (Streaming): {self.release_date_streaming}\n"
+                f"-Synopsis: {self.synopsis}\n"
+                f"-Length: {self.length}\n"
+                f"-Directors: {', '.join(self.directors)}\n"
+                f"-Cast: {', '.join(self.cast)}\n"
+                f"-Platforms: {', '.join(self.platforms)}\n"
+                f"-Content Rating: {self.content_rating}\n"
+                f"-Critics Average Rating: {self.crit_avr_rating}\n"
+                f"-User Average Rating: {self.usr_avr_rating}")
