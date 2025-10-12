@@ -1,4 +1,5 @@
 from src.crawler_manager import CrawlerManager
+import socket
 
 
 def main():
@@ -6,7 +7,6 @@ def main():
     crawler.run()
 
 if __name__ == "__main__":
-    import socket
     old_getaddrinfo = socket.getaddrinfo
     def new_getaddrinfo(*args, **kwargs):
         responses = old_getaddrinfo(*args, **kwargs)

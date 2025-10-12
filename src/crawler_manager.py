@@ -18,7 +18,7 @@ class CrawlerManager(Observer):
         self.imdb_url_queue = PeriodicQueue(0)
         self.lettr_url_queue = PeriodicQueue(0)
         self.rott_url_queue = PeriodicQueue(0)
-        self.imdb_url_queue.put(URL("https://www.imdb.com/title/tt0133093", URLType.IMDB))
+        self.imdb_url_queue.put(URL("https://www.imdb.com/title/tt0133093/", URLType.IMDB))
         self.lettr_url_queue.put(URL("https://letterboxd.com/film/the-matrix/", URLType.LTTR))
         self.rott_url_queue.put(URL("https://www.rottentomatoes.com/m/matrix", URLType.ROTT))
         self.storage = Storage()
@@ -33,7 +33,7 @@ class CrawlerManager(Observer):
     
     def run(self):
         # Creates all scrapers
-        # imdb_scraper = IMDBScraper(self.imdb_url_queue, self.storage)
+        imdb_scraper = IMDBScraper(self.imdb_url_queue, self.storage)
         # lettr_scraper = LettrScraper(self.lettr_url_queue, self.storage)
         rott_scraper = RottScraper(self.rott_url_queue, self.storage)
         
@@ -42,12 +42,12 @@ class CrawlerManager(Observer):
         self.storage.enroll_new_scraper(URLType.ROTT)
         
         # Creates a thread for each scraper
-        # imdb_thread = threading.Thread(target=imdb_scraper.run)
+        imdb_thread = threading.Thread(target=imdb_scraper.run)
         # lettr_thread = threading.Thread(target=lettr_scraper.run)
         rott_thread = threading.Thread(target=rott_scraper.run)
         
         # Start all threads
-        # imdb_thread.start()
+        imdb_thread.start()
         # lettr_thread.start()
         rott_thread.start()
         
@@ -55,12 +55,12 @@ class CrawlerManager(Observer):
         self.mutex.acquire()
         
         # Request scrapers to stop
-        # imdb_scraper.stop()
+        imdb_scraper.stop()
         # lettr_scraper.stop()
         rott_scraper.stop()
 
         # Espera a thread for each scraper
-        # imdb_thread.join()
+        imdb_thread.join()
         # lettr_thread.join()
         rott_thread.join()
         
