@@ -80,7 +80,7 @@ class IMDBScraper(Scraper):
         movie.set_cast(cast)
 
         # Usr reviews
-        usr_review_url = url.get_url() + "/reviews"
+        usr_review_url = url.get_url() + "reviews"
         resp = requests.get(usr_review_url, headers=self.headers)
         reviews_site = BeautifulSoup(resp.text, "html.parser")
 

@@ -18,7 +18,7 @@ class CrawlerManager(Observer):
         self.imdb_url_queue = PeriodicQueue(0)
         self.lettr_url_queue = PeriodicQueue(0)
         self.rott_url_queue = PeriodicQueue(0)
-        self.imdb_url_queue.put(URL("https://www.imdb.com/title/tt0133093", URLType.IMDB))
+        self.imdb_url_queue.put(URL("https://www.imdb.com/title/tt0133093/", URLType.IMDB))
         self.lettr_url_queue.put(URL("https://letterboxd.com/film/the-matrix/", URLType.LTTR))
         self.rott_url_queue.put(URL("https://www.rottentomatoes.com/m/matrix", URLType.ROTT))
         self.storage = Storage()
