@@ -137,7 +137,7 @@ class IMDBScraper(Scraper):
 # content_rating -> Ok
 # crit_avr_rating
 # crit_rev_count
-# crit_reviews
+# crit_reviews -> Todas são reviews externas, remover esse atributo?
 # usr_avr_rating -> Ok
 # usr_reviews -> Ok
 # usr_rev_count -> Ok
