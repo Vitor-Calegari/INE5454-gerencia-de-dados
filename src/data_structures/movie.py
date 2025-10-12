@@ -17,8 +17,10 @@ class Movie:
         self.content_rating = ""
         self.crit_avr_rating = 0
         self.crit_reviews = []
+        self.crit_rev_count = 0
         self.usr_avr_rating = 0
         self.usr_reviews = []
+        self.usr_rev_count = 0
     
     # Getters -----------------------
     def get_title(self) -> str:
@@ -60,11 +62,17 @@ class Movie:
     def get_crit_reviews(self) -> list:
         return self.crit_reviews
     
+    def get_crit_reviews(self) -> int:
+        return self.crit_rev_count
+    
     def get_usr_avr_rating(self) -> float:
         return self.usr_avr_rating
     
     def get_usr_reviews(self) -> list:
         return self.usr_reviews
+    
+    def get_usr_reviews(self) -> int:
+        return self.usr_rev_count
     
     # Setters -----------------------
     def set_title(self, title: str) -> None:
@@ -106,11 +114,17 @@ class Movie:
     def set_crit_reviews(self, reviews: list) -> None:
         self.crit_reviews = reviews
     
+    def set_crit_rev_count(self, reviews_count: int) -> None:
+        self.crit_rev_count = reviews_count
+    
     def set_usr_avr_rating(self, rating: float) -> None:
         self.usr_avr_rating = rating
     
     def set_usr_reviews(self, reviews: list) -> None:
         self.usr_reviews = reviews
+    
+    def set_usr_rev_count(self, reviews_count: int) -> None:
+        self.usr_rev_count = reviews_count
 
     # List insertion methods
     def add_genre(self, genre: str) -> None:
@@ -145,4 +159,6 @@ class Movie:
                 f"-Platforms: {', '.join(self.platforms)}\n"
                 f"-Content Rating: {self.content_rating}\n"
                 f"-Critics Average Rating: {self.crit_avr_rating}\n"
-                f"-User Average Rating: {self.usr_avr_rating}")
+                f"-Critics Rating count: {self.crit_rev_count}\n"
+                f"-User Average Rating: {self.usr_avr_rating}\n"
+                f"-User Rating count: {self.usr_rev_count}")
