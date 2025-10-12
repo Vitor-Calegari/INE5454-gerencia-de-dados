@@ -7,7 +7,7 @@ from pathlib import Path
 
 class Storage(Observed):
     
-    def __init__(self, threshold: int = 1) -> None:
+    def __init__(self, threshold: int = 2) -> None:
         super().__init__()
         self.scrapers = {}
         self.threshold = threshold
@@ -81,4 +81,4 @@ class Storage(Observed):
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
 
-            print(f"✅ Arquivo salvo em: {output_path.resolve()}")
+            print(f"Arquivo salvo em: {output_path.resolve()}")

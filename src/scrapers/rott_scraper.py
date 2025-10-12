@@ -5,6 +5,7 @@ from src.data_structures.movie import Movie
 from src.data_structures.review import Review
 import requests
 from bs4 import BeautifulSoup
+from src.storage import Storage
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
