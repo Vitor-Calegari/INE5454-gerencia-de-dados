@@ -1,0 +1,239 @@
+{
+    "filmes": [
+        {
+            "url": "https://www.rottentomatoes.com/m/matrix",
+            "titulo": "The Matrix",
+            "generos": [
+                "Sci-Fi",
+                "Action",
+                "Mystery & Thriller"
+            ],
+            "data": "Mar 31, 1999, Wide",
+            "sinopse": "Neo believes that Morpheus, an elusive figure considered to be the most dangerous man alive, can answer his question -- What is the Matrix? Neo is contacted by Trinity, a beautiful stranger who leads him into an underworld where he meets Morpheus. They fight a brutal battle for their lives against a cadre of viciously intelligent secret agents. It is a truth that could cost Neo something more precious than his life.",
+            "duracao": "2h 16m",
+            "diretor": "Lilly Wachowski, Lana Wachowski",
+            "cast": [
+                "Keanu Reeves",
+                "Laurence Fishburne",
+                "Carrie-Anne Moss",
+                "Hugo Weaving",
+                "Joe Pantoliano",
+                "Gloria Foster",
+                "Marcus Chong",
+                "Paul Goddard",
+                "Robert Taylor",
+                "Julian Arahanga",
+                "Matt Doran",
+                "Belinda McClory",
+                "Anthony Ray Parker",
+                "Rowan Witt"
+            ],
+            "media_crit": "83%",
+            "reviews_crit": [
+                {
+                    "avaliacao": 9.0,
+                    "texto": "Making a great film that's a psychedelic, kung-fu-inspired meditation on the human condition is a tall order. The Matrix delivers on all that & more.",
+                    "data": "Sep 27, 2024"
+                },
+                {
+                    "avaliacao": 10.0,
+                    "texto": "“The Matrix” is the AI prophecy and wake-up call the human race is in dire need of. Watching the 2024 re-release is highly recommended.",
+                    "data": "Sep 25, 2024"
+                },
+                {
+                    "avaliacao": 10.0,
+                    "texto": "An amazing cocktail of martial arts, shootouts, philosophy, romance, fantasy, revolutionary visual effects and perfect casting. “The Matrix” surprised us 25 years ago, and it continues to surprise us in the Year of Our Lord 2024. Full review in Spanish.",
+                    "data": "Sep 21, 2024"
+                },
+                {
+                    "avaliacao": 0.0,
+                    "texto": "The Wachowskis proceed to turn the world as we know it into a virtual reality landscape with a 20th century tech-noir look (lit with a sickly green hue, like the glow of an old IBM computer screen) and the physics of a video game.",
+                    "data": "Sep 9, 2023"
+                },
+                {
+                    "avaliacao": 0.0,
+                    "texto": "A $60 million, high-tech assault on the senses and a pretentious insult to the mind.",
+                    "data": "Jul 15, 2023"
+                },
+                {
+                    "avaliacao": 0.0,
+                    "texto": "A cyberpunk thriller that's so much fun to watch, it could single-handedly reboot the genre.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 0.0,
+                    "texto": "The Wachowskis seem to be saying that while state-of-the-art effects speak for themselves, loud and clear, there's still room amid all the kicking and shooting and shouting for the carefully observed human emotion.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 6.25,
+                    "texto": "Though The Matrix ultimately overdoses on gloom-and-doom grunge, over-elaborate cool and especially running time, it's just clever enough to enable [the Wachowskis] to nix the sophomore jinx following 1996's Bound.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 0.0,
+                    "texto": "I know almost nothing of the intricate techniques that make The Matrix as eye-filling as it is brain-numbing, but I can tell you that... [its visuals] are wondrous to behold.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 6.0,
+                    "texto": "If you're looking for a good spring fix of existentialist sci-fi, look no further than The Matrix -- then do everything you can to look deeper than the skin-tight surface.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 8.0,
+                    "texto": "Although it's sometimes too confounding for its own good and a little heavy on the Zen-inspired techno-babble, The Matrix is a consistently absorbing assault on the senses.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 0.0,
+                    "texto": "There's more form than content in The Matrix, but Bill Pope's swooping, noir-inflected cinematography is wonderfully complemented by Owen Paterson's inventive production design, a great soundtrack and the best fight choreography this side of Hong Kong.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 7.5,
+                    "texto": "Give [the Wachowskis] an A for effort and three A's for those effects. The Matrix is a dazzlingly original visual adventure.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 2.5,
+                    "texto": "Casting the robotic Reeves as the hope of humanity may be this oppressively long, self-satisfied movie's funniest gag, but it doesn't really make the game any fun. It means we get stuck with the least interesting player.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 6.25,
+                    "texto": "The Matrix's pleasures are considerable, but they're all purely visceral, too, lacking the mythology that would have elevated the movie. The movie is best taken as the first entry in a brand-new genre: post-modern sci-fi pulp.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 0.0,
+                    "texto": "How could filmmakers who are so skilled and imaginative lose themselves (and us) in what feels like a college stab at Aldous Huxley metaphysics?",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 4.0,
+                    "texto": "A futuristic paranoia extravaganza, it would seem to have far more appeal to an artificial intelligence than it would to human beings and other carbon-based life forms.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "An interminable, sterile, exercise in cinematographic onanism.  [Full review in Spanish]",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 0.0,
+                    "texto": "Like last year's Dark City, the effects and storyline of The Matrix plow through enough fresh territory to make it worth seeing.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": 6.25,
+                    "texto": "Visually, at least, The Matrix more than lives up to its billing. Writer-directors [the Wachowskis] seem to literally bring the screen to life with action scenes that define the word kinetic.",
+                    "data": "Jul 13, 2023"
+                }
+            ],
+            "media_usr": "85%",
+            "reviews_usr": [
+                {
+                    "avaliacao": 5.0,
+                    "texto": "To be honest, one of the best sci-fi movies I've ever seen because it really go through the question of \"do we really live in the world we live in\", really thought-provoking  and well paced : everything isn't explained and laid out to you : you have to follow the storyline and understand by yourself (more immersive than usual Sci-fi movies).  It aged a bit, yeah, but still have impressive effects and CGI is really specific at this movie, a revolutionnary futuristic style with new ways of editing (at the time it was published). The music is also more original than usual with Rage Against The Machine and electro/grunge music that really goes well with the overall atmosphere. \n And surprisingly, the following movies are as good as this one (maybe less impressive because effects were less surprising) with a well-thought storyline and effects obviously.",
+                    "data": "Oct 9, 2025"
+                },
+                {
+                    "avaliacao": 4.5,
+                    "texto": "so really good. and it's the best.",
+                    "data": "Sep 30, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "It was absolutely incredible on the big screen!!! I didn’t get to see it on its initial run, but I didn’t see the sequels.  This was a full circle moment and I’m so glad I got to experience as the director’s intended it to be.",
+                    "data": "Sep 28, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "Greatest movie of my time",
+                    "data": "Sep 20, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "The matrix is a Extremely important piece of cinema. It was shot pre 911. It had come just 2 years before star wars rebooted episode 1. Amd, It was badass. The whole comcelt was something I nyself truly thought up once. Completely differe t vision for the film. Bjt i still had this film in my mind. I gill this day in 2025 say its the best film rver. Msde handd down bh a mile. Watch this m ow!!!!!",
+                    "data": "Sep 18, 2025"
+                },
+                {
+                    "avaliacao": 4.0,
+                    "texto": "The ai predict thing is kinda cool",
+                    "data": "Sep 7, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "The Matrix is one of those movies that everyone should probably see. The cultural impact that this movie has had on the world (in both good and bad ways) is completely incomparable. There are people out there that think the undertones of spiritual and world views in this film are actually real. The action in this movie is amazing, and the story in peak. If you haven't seen this yet, now is the time.",
+                    "data": "Aug 30, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "An amazing movie in the year of amazing movies, 1999 was perfect",
+                    "data": "Aug 30, 2025"
+                },
+                {
+                    "avaliacao": 4.5,
+                    "texto": "Even decades later, The Matrix (1999) remains a landmark in science fiction cinema. Blending groundbreaking visuals like the now-legendary Bullet Time with a thought-provoking exploration of reality, it offered audiences both spectacle and substance. Neo’s journey into a world where the only limits are mental redefined action filmmaking, with wire-fu combat and practical effects giving the movie a timeless quality that CGI-heavy productions of the era often lack. While the Wachowskis’ dialogue occasionally stumbles, the film’s mix of philosophy, suspense, and unforgettable set pieces still captivates. A genre classic that continues to inspire, even if its once-shocking message no longer hits quite as hard.",
+                    "data": "Aug 24, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "Masterpiece of all time",
+                    "data": "Aug 13, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "Esse é o TOP 1 da lista de filmes da minha vida! Eu amo demais! Devo ter assistido mais de cinquenta vezes!!! É minha imersão desse mundo \"real\"!!! Viajo para Zion mentalmente e sei que, se pudesse, não voltaria!!! Cadê as empresas tecnológicas para desenvolverem um dispositivo tipo o do VINGADOR DO FUTURO com o Schwarzenegger!!!",
+                    "data": "Aug 9, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "Must see. This movie slaps",
+                    "data": "Jul 30, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "I felt so badass after I had finished watching it.",
+                    "data": "Jul 29, 2025"
+                },
+                {
+                    "avaliacao": 2.0,
+                    "texto": "Many things wrong with it for me but decent direction and ideas.",
+                    "data": "Jul 28, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "I took the red pill and now my Wi-Fi won’t stop glitching. 10/10 would question reality again.",
+                    "data": "Jul 27, 2025"
+                },
+                {
+                    "avaliacao": 4.0,
+                    "texto": "The movie that changed everything in 1999 remains highly viewable in 2025.",
+                    "data": "Jul 25, 2025"
+                },
+                {
+                    "avaliacao": 4.5,
+                    "texto": "After all these years, the storytelling, special effects, gunplay & martial arts action are still enough to make the audience gasp: “whoa…”",
+                    "data": "Jul 20, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "Greatest movie ever? Maybe…",
+                    "data": "Jul 20, 2025"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "One of my top 3 films ever made.  An absolute masterpiece of an action film. The CGI and the camera work was so far ahead of its time. You still see inspiration in films nowadays because of how iconic and memorable this film was!  Keanu Reeves was and still is awesome when on camera.  Hugo Weaving as Agent Smith was such a smart casting choice. He gives off this almost creepy vibe at times just from how he speaks so softly and calmly while fighting. Honestly there is a lot more I could say but it would be an entire book worth of words. Long story short this film is awesome.",
+                    "data": "Jul 19, 2025"
+                },
+                {
+                    "avaliacao": 4.0,
+                    "texto": "this is a great movie for people that love action movies",
+                    "data": "Jul 17, 2025"
+                }
+            ]
+        }
+    ]
+}

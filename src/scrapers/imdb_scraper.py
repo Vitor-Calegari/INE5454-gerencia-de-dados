@@ -4,8 +4,8 @@ from typing import override
 
 class IMDBScraper(Scraper):
     
-    def __init__(self, periodic_queue):
-        super().__init__(periodic_queue)
+    def __init__(self, periodic_queue, storage):
+        super().__init__(periodic_queue, storage)
     
     @override
     def scrap(self):
