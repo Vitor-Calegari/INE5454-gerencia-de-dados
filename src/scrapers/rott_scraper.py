@@ -178,19 +178,8 @@ class RottScraper(Scraper):
 
             review = Review()
             review.set_text(texto)
-            review.set_rating(self._convert_rating(nota))
+            review.set_rating(nota)
             review.set_date(data)
             reviews.append(review)
         return reviews
 
-    def _convert_rating(self, nota: str) -> float:
-        """
-        Converte "3/5", "B+", etc. em número aproximado.
-        """
-        if "/" in nota:
-            try:
-                n, d = nota.split("/")
-                return float(n) / float(d) * 10
-            except Exception:
-                return 0.0
-        return 0.0
