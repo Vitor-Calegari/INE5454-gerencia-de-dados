@@ -9,6 +9,12 @@ class PeriodicQueue(queue.Queue):
         self._min_interval = min_interval
         self._last_dequeue_time = 0.0
         self._lock = threading.Lock()
+        self._seen_items = set()
+    
+    def put(self, item):
+        if item not in self._seen_items:
+            super().put(item)
+            self._seen_items.add(item)
 
     def get(self, block=True, timeout=None):
         with self._lock:
