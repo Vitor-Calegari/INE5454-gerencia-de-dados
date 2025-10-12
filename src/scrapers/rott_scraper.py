@@ -1,6 +1,6 @@
 from src.scrapers.scraper import Scraper
 from typing import override
-from src.data_structures.url import URLType
+from src.data_structures.url import URLType, URL
 from src.data_structures.movie import Movie
 from src.data_structures.review import Review
 import requests
@@ -49,6 +49,14 @@ class RottScraper(Scraper):
         movie.set_usr_reviews(self._get_user_reviews(url_str))
         movie.set_crit_reviews(self._get_critic_reviews(url_str))
 
+        more_like_this = site.find("section", {"data-qa": "section:more-like-this"})
+        if more_like_this:
+            # Dentro dela, procura todos os <rt-link> que tenham o slot "primaryImage"
+            for link_tag in more_like_this.select('rt-link[slot="primaryImage"]'):
+                href = link_tag.get("href")
+                if href and href.startswith("/m/"):  # garante que é link de filme
+                    self.periodic_queue.put(URL("https://www.rottentomatoes.com" + href, URLType.ROTT))
+                    
         self.storage.store_movie(movie, URLType.ROTT)
         return movie
 
