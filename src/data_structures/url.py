@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class URLType(Enum):
+    END = -1
     IMDB = 0
     ROTT = 1
     LTTR = 2

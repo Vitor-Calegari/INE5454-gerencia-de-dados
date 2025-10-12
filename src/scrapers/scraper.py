@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from src.data_structures.periodic_queue import PeriodicQueue
+from src.data_structures.url import URL, URLType
 from src.storage import Storage
+from threading import Lock
 
 class Scraper(ABC):
     
@@ -8,13 +10,18 @@ class Scraper(ABC):
         self.periodic_queue = periodic_queue
         self.storage = storage
         self.running = True
+        self._lock = Lock()
     
     def stop(self) -> None:
-        self.periodic_queue.put("ScraperEnded!")
-        self.runnning = False
+        with self._lock:
+            self.running = False
+        self.periodic_queue.put(URL("ScraperEnded!", URLType.END))
     
     def run(self) -> None:
-        while self.running:
+        while True:
+            with self._lock:
+                if not self.running:
+                    break
             self.scrap()
 
     @abstractmethod
