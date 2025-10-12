@@ -9,6 +9,7 @@ from src.observers import Observer
 from typing import override
 from src.data_structures.url import URL, URLType
 
+from src.data_structures.url import URL, URLType
 
 class CrawlerManager(Observer):
     
@@ -17,6 +18,8 @@ class CrawlerManager(Observer):
         self.imdb_url_queue = PeriodicQueue(0)
         self.lettr_url_queue = PeriodicQueue(0)
         self.rott_url_queue = PeriodicQueue(0)
+        self.imdb_url_queue.put(URL("https://www.imdb.com/title/tt0133093", URLType.IMDB))
+        self.lettr_url_queue.put(URL("https://letterboxd.com/film/the-matrix/", URLType.LTTR))
         self.rott_url_queue.put(URL("https://www.rottentomatoes.com/m/matrix", URLType.ROTT))
         self.storage = Storage()
         self.storage.attach(self)
@@ -33,6 +36,9 @@ class CrawlerManager(Observer):
         # imdb_scraper = IMDBScraper(self.imdb_url_queue, self.storage)
         # lettr_scraper = LettrScraper(self.lettr_url_queue, self.storage)
         rott_scraper = RottScraper(self.rott_url_queue, self.storage)
+        
+        self.storage.enroll_new_scraper(URLType.IMDB)
+        self.storage.enroll_new_scraper(URLType.LTTR)
         self.storage.enroll_new_scraper(URLType.ROTT)
         
         # Creates a thread for each scraper

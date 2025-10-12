@@ -14,7 +14,7 @@ headers = {
 
 class RottScraper(Scraper):
     
-    def __init__(self, periodic_queue, storage):
+    def __init__(self, periodic_queue, storage: Storage):
         super().__init__(periodic_queue, storage)
     
     @override
