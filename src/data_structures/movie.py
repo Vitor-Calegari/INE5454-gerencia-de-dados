@@ -62,7 +62,7 @@ class Movie:
     def get_crit_reviews(self) -> list:
         return self.crit_reviews
     
-    def get_crit_reviews(self) -> int:
+    def get_crit_reviews_count(self) -> int:
         return self.crit_rev_count
     
     def get_usr_avr_rating(self) -> float:
@@ -71,7 +71,7 @@ class Movie:
     def get_usr_reviews(self) -> list:
         return self.usr_reviews
     
-    def get_usr_reviews(self) -> int:
+    def get_usr_reviews_count(self) -> int:
         return self.usr_rev_count
     
     # Setters -----------------------
