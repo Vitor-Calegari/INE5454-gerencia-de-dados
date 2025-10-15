@@ -5,6 +5,7 @@ from typing import override
 from src.storage import Storage
 from bs4 import BeautifulSoup
 import requests
+import re
 
 
 class LettrScraper(Scraper):
@@ -58,6 +59,12 @@ class LettrScraper(Scraper):
             # legth
             movie.set_length(self.get_length(site))
 
+            # ratings and stats
+            self.get_ratings_stats(site)
+
+            # reviws --> most popular
+            movie.set_usr_reviews(self.get_reviews(site))
+
     def get_details(self, site):
         details = site.find("div", {"class": "details"})
         title = details.find("span", {"class": "name js-widont prettify"}).text
@@ -98,6 +105,61 @@ class LettrScraper(Scraper):
         lenght = footer_parts[0] + " " + footer_parts[1]
         return lenght
 
+    # def get_ratings_stats(self, site):
+    #     ratings_section1 = site.find("aside", {"class": "sidebar"})
+    #     list = ratings_section1.find_all("section")
+    #     print(len(list))
+    #     ratings_section = ratings_section1.find("span", {"class": "average-rating"})
+    #     rating_info = ratings_section.find("a")["data-original-title"].text
+    #     numbers = re.findall(r"[\d,]+\.\d+|[\d,]+", rating_info)
+    #     num_average = float(numbers[0])
+    #     num_ratings = int(numbers[1].replace(",", ""))
+    #     print("Average:", num_average)
+    #     print("Ratings:", num_ratings)
+
+    def get_reviews(self, site):
+        reviews_section = site.find(
+            "section", {"class": "film-reviews section js-popular-reviews"}
+        )
+        url_reviews_tag = reviews_section.find("a")
+        url_reviews = "https://letterboxd.com" + url_reviews_tag["href"]
+
+        response = requests.get(url_reviews, headers=self.headers)
+        if response.ok:
+            site = BeautifulSoup(response.content, "html.parser")
+            reviews_section = site.find(
+                "div", {"class": "viewing-list -marginblockstart"}
+            )
+            reviews_list = reviews_section.find_all("div", class_="listitem")
+            reviews = []
+            for review_tag in reviews_list:
+                review_score = review_tag.find(
+                    "span", class_=re.compile(r"^rating")
+                ).text
+
+                review_score_num = 0
+                for char in review_score.strip():
+                    if char == "★":
+                        review_score_num += 1
+                    else:
+                        review_score_num += 0.5
+
+                data = review_tag.find("time")["datetime"]
+                review_text = (
+                    review_tag.find(
+                        "div",
+                        class_="body-text -prose -reset js-review-body js-collapsible-text",
+                    )
+                    .find("p")
+                    .text
+                )
+
+                reviews.append(
+                    {"avaliacao": review_score_num, "texto": review_text, "data": data}
+                )
+            return reviews
+        return []
+
 
 # Lista de infos:
 # url -> Ok
@@ -110,11 +172,11 @@ class LettrScraper(Scraper):
 # directors -> Ok
 # cast -> Ok
 
-# platforms -> 
+# platforms ->
 # content_rating ->
 # crit_avr_rating
 # crit_rev_count
 # crit_reviews ->
 # usr_avr_rating ->
-# usr_reviews ->
+# usr_reviews -> Ok
 # usr_rev_count ->
