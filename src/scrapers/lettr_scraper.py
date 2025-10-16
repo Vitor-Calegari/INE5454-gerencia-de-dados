@@ -1,9 +1,11 @@
+from src.data_structures.review import Review
 from src.scrapers.scraper import Scraper
 from src.data_structures.movie import Movie
 from src.data_structures.url import URL, URLType
 from typing import override
 from src.storage import Storage
 from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 import requests
 import re
 
@@ -59,11 +61,32 @@ class LettrScraper(Scraper):
             # legth
             movie.set_length(self.get_length(site))
 
-            # ratings and stats
-            self.get_ratings_stats(site)
+            # reviews --> most popular
+            self.get_reviews(site, movie)
 
-            # reviws --> most popular
-            movie.set_usr_reviews(self.get_reviews(site))
+            with sync_playwright() as p:
+
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+
+                page.goto(url.get_url(), wait_until="domcontentloaded")
+                print(page.title())
+                texto = page.text_content("h1").strip()
+
+                # ratings and stats --> Dinamico
+                movie.set_usr_avr_rating(self.get_ratings_stats(page)[0])
+                movie.set_usr_rev_count(self.get_ratings_stats(page)[1])
+
+                # plataforms --> Dinamico
+                self.get_plataforms(page)
+
+                # similar movies --> Dinamico
+                self.get_similar_movies(page)
+
+                browser.close()
+
+            # print(movie.__str__())
+            self.storage.store_movie(movie, URLType.LTTR)
 
     def get_details(self, site):
         details = site.find("div", {"class": "details"})
@@ -79,7 +102,7 @@ class LettrScraper(Scraper):
 
     def get_cast(self, site):
         details = site.find("div", {"class": "cast-list text-sluglist"})
-        cast_tags = details.find_all("div", class_="text-slug tooltip")
+        cast_tags = details.find_all("a", class_="text-slug tooltip")
         cast = [a.text.strip() for a in cast_tags]
         return cast
 
@@ -105,19 +128,32 @@ class LettrScraper(Scraper):
         lenght = footer_parts[0] + " " + footer_parts[1]
         return lenght
 
-    # def get_ratings_stats(self, site):
-    #     ratings_section1 = site.find("aside", {"class": "sidebar"})
-    #     list = ratings_section1.find_all("section")
-    #     print(len(list))
-    #     ratings_section = ratings_section1.find("span", {"class": "average-rating"})
-    #     rating_info = ratings_section.find("a")["data-original-title"].text
-    #     numbers = re.findall(r"[\d,]+\.\d+|[\d,]+", rating_info)
-    #     num_average = float(numbers[0])
-    #     num_ratings = int(numbers[1].replace(",", ""))
-    #     print("Average:", num_average)
-    #     print("Ratings:", num_ratings)
+    # --> Dinâmico, usar selenium
+    def get_ratings_stats(self, page):
+        section = page.locator("section.ratings-histogram-chart")
+        avg_rating = section.locator("span.average-rating a").get_attribute(
+            "data-original-title"
+        )
+        numbers = re.findall(r"[\d,]+\.\d+|[\d,]+", avg_rating)
+        num_average = float(numbers[0])
+        num_ratings = int(numbers[1].replace(",", ""))
+        return num_average, num_ratings
 
-    def get_reviews(self, site):
+    # --> Dinâmico, usar selenium
+    def get_plataforms(self, page):
+        pass
+        # services_section = site.find("div", {"id": "watch"})
+        # list_services_tag = services_section.find_all("p")
+        # list_services = []
+        # for p in list_services_tag:
+        #     service_text = p.find("a")["data-original-title"].strip("View on ")
+        #     list_services.append(service_text)
+        # print(list_services)
+
+    def get_similar_movies(self, page):
+        pass
+
+    def get_reviews(self, site, movie):
         reviews_section = site.find(
             "section", {"class": "film-reviews section js-popular-reviews"}
         )
@@ -131,7 +167,6 @@ class LettrScraper(Scraper):
                 "div", {"class": "viewing-list -marginblockstart"}
             )
             reviews_list = reviews_section.find_all("div", class_="listitem")
-            reviews = []
             for review_tag in reviews_list:
                 review_score = review_tag.find(
                     "span", class_=re.compile(r"^rating")
@@ -144,7 +179,7 @@ class LettrScraper(Scraper):
                     else:
                         review_score_num += 0.5
 
-                data = review_tag.find("time")["datetime"]
+                date = review_tag.find("time")["datetime"]
                 review_text = (
                     review_tag.find(
                         "div",
@@ -154,10 +189,12 @@ class LettrScraper(Scraper):
                     .text
                 )
 
-                reviews.append(
-                    {"avaliacao": review_score_num, "texto": review_text, "data": data}
-                )
-            return reviews
+                usr_review = Review()
+                usr_review.set_date(date)
+                usr_review.set_rating(review_score_num)
+                usr_review.set_text(review_text)
+                movie.add_user_review(usr_review)
+            return
         return []
 
 
@@ -172,11 +209,12 @@ class LettrScraper(Scraper):
 # directors -> Ok
 # cast -> Ok
 
-# platforms ->
-# content_rating ->
-# crit_avr_rating
-# crit_rev_count
-# crit_reviews ->
-# usr_avr_rating ->
+# platforms -> Dinamico
+# content_rating -> Não tem no Letterbox
+# crit_avr_rating -> Não tem no Letterbox
+# crit_rev_count -> Não tem no Letterbox
+# crit_reviews -> Não tem no Letterbox
+
+# usr_avr_rating -> Dinamico
 # usr_reviews -> Ok
-# usr_rev_count ->
+# usr_rev_count -> Dinamico
