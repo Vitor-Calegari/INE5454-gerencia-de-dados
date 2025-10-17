@@ -40,28 +40,20 @@ class LettrScraper(Scraper):
             movie = Movie()
             movie.set_url(url=url.get_url())
 
-            # detalhes iniciais
             title, directors = self.get_details(site)
             movie.set_title(title)
             movie.set_directors(directors)
 
-            # synopsis
             synopsis = self.get_synopsis(site)
             movie.set_synopsis(synopsis)
 
-            # section principal
             section = site.find("div", {"id": "tabbed-content"})
-            # ---> cast
             movie.set_cast(self.get_cast(section))
-            # --->release date (Brasil)
             movie.set_release_date_theater(self.get_release_date(section))
-            # ---> genres
             movie.set_genres(self.get_genres(section))
 
-            # legth
             movie.set_length(self.get_length(site))
 
-            # reviews --> most popular
             self.get_reviews(site, movie)
 
             with sync_playwright() as p:
@@ -70,18 +62,16 @@ class LettrScraper(Scraper):
                 page = browser.new_page()
 
                 page.goto(url.get_url(), wait_until="domcontentloaded")
-                print(page.title())
-                texto = page.text_content("h1").strip()
 
-                # ratings and stats --> Dinamico
-                movie.set_usr_avr_rating(self.get_ratings_stats(page)[0])
-                movie.set_usr_rev_count(self.get_ratings_stats(page)[1])
+                avr, count = self.get_ratings_stats(page)
+                movie.set_usr_avr_rating(avr)
+                movie.set_usr_rev_count(count)    
 
-                # plataforms --> Dinamico
-                self.get_plataforms(page)
+                links = self.get_similar_movies(page)            
+                for link in links:
+                    self.periodic_queue.put(URL(link, URLType.LTTR))
 
-                # similar movies --> Dinamico
-                self.get_similar_movies(page)
+                plataforms = self.get_plataforms(page)
 
                 browser.close()
 
@@ -127,8 +117,17 @@ class LettrScraper(Scraper):
         footer_parts = footer_text.split()
         lenght = footer_parts[0] + " " + footer_parts[1]
         return lenght
+    
+    def get_similar_movies(self, page):
+        section = page.locator("ul.poster-list.-p110.-horizontal.-scaled104")
+        items = section.locator("li")
+        links = []
+        for i in range(items.count()):
+            link = items.nth(i).locator("div.react-component").get_attribute("data-item-link")
+            links.append("https://letterboxd.com" + link)
+        return links
 
-    # --> Dinâmico, usar selenium
+    # --> Dinâmico
     def get_ratings_stats(self, page):
         section = page.locator("section.ratings-histogram-chart")
         avg_rating = section.locator("span.average-rating a").get_attribute(
@@ -138,20 +137,17 @@ class LettrScraper(Scraper):
         num_average = float(numbers[0])
         num_ratings = int(numbers[1].replace(",", ""))
         return num_average, num_ratings
-
+        
     # --> Dinâmico, usar selenium
     def get_plataforms(self, page):
-        pass
-        # services_section = site.find("div", {"id": "watch"})
-        # list_services_tag = services_section.find_all("p")
-        # list_services = []
-        # for p in list_services_tag:
-        #     service_text = p.find("a")["data-original-title"].strip("View on ")
-        #     list_services.append(service_text)
-        # print(list_services)
-
-    def get_similar_movies(self, page):
-        pass
+        div = page.locator("section.services.-showall")
+        span_locator = div.locator("span.name")
+        plataforms = []
+        for i in range(span_locator.count()):
+            title = span_locator.nth(i).text_content()
+            if title:
+                plataforms.append(title)
+        return plataforms
 
     def get_reviews(self, site, movie):
         reviews_section = site.find(
@@ -168,9 +164,10 @@ class LettrScraper(Scraper):
             )
             reviews_list = reviews_section.find_all("div", class_="listitem")
             for review_tag in reviews_list:
-                review_score = review_tag.find(
-                    "span", class_=re.compile(r"^rating")
-                ).text
+                review_score_span = review_tag.find("span", class_=re.compile(r"^rating"))
+
+                if review_score_span:
+                    review_score = review_score_span.text
 
                 review_score_num = 0
                 for char in review_score.strip():
@@ -180,20 +177,15 @@ class LettrScraper(Scraper):
                         review_score_num += 0.5
 
                 date = review_tag.find("time")["datetime"]
-                review_text = (
-                    review_tag.find(
-                        "div",
-                        class_="body-text -prose -reset js-review-body js-collapsible-text",
-                    )
-                    .find("p")
-                    .text
-                )
-
-                usr_review = Review()
-                usr_review.set_date(date)
-                usr_review.set_rating(review_score_num)
-                usr_review.set_text(review_text)
-                movie.add_user_review(usr_review)
+                review = review_tag.find("div", class_="body-text -prose -reset js-review-body js-collapsible-text") 
+        
+                if review:
+                    review_text = review.find("p").text
+                    usr_review = Review()
+                    usr_review.set_date(date)
+                    usr_review.set_rating(review_score_num)
+                    usr_review.set_text(review_text)
+                    movie.add_user_review(usr_review)
             return
         return []
 
@@ -209,12 +201,12 @@ class LettrScraper(Scraper):
 # directors -> Ok
 # cast -> Ok
 
-# platforms -> Dinamico
+# platforms -> Ok
 # content_rating -> Não tem no Letterbox
 # crit_avr_rating -> Não tem no Letterbox
 # crit_rev_count -> Não tem no Letterbox
 # crit_reviews -> Não tem no Letterbox
 
-# usr_avr_rating -> Dinamico
+# usr_avr_rating -> Ok
 # usr_reviews -> Ok
-# usr_rev_count -> Dinamico
+# usr_rev_count -> OK
