@@ -7,7 +7,7 @@ from pathlib import Path
 
 class Storage(Observed):
     
-    def __init__(self, threshold: int = 50) -> None:
+    def __init__(self, threshold: int = 1) -> None:
         super().__init__()
         self.scrapers = {}
         self.threshold = threshold
@@ -71,6 +71,12 @@ class Storage(Observed):
                                 "texto": r.get_text(),
                                 "data": r.get_date()
                             } for r in movie.get_usr_reviews()
+                        ],
+                        "plataforms": [
+                            {
+                                "plat_name": p.plataform,
+                                "url": p.link
+                            } for p in movie.get_platforms()
                         ]
                     }
 
