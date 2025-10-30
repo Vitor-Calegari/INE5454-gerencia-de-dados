@@ -2,6 +2,7 @@ from src.data_structures.periodic_queue import PeriodicQueue
 from src.storage import Storage
 from src.scrapers.lettr_scraper import LettrScraper
 from src.data_structures.url import URL, URLType
+import logging
 
 
 if __name__ == "__main__":
