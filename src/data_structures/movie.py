@@ -67,7 +67,6 @@ class Movie:
         
         movie.get_length(self.get_length())
         
-        # TODO Devemos ver se existem diretores diferentes entre sites?
         movie.set_directors(self.get_directors())              
         
         movie.set_cast(self.get_cast())

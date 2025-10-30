@@ -17,6 +17,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import time
+import pandas as pd
 
 
 class IMDBScraper(Scraper):
@@ -53,7 +54,9 @@ class IMDBScraper(Scraper):
 
             duration = data.get("duration")
             if duration:
-                movie.set_length(duration)
+                pd_duration = pd.to_timedelta("PT2H16M")
+                formatted = str(pd_duration).split()[-1]
+                movie.set_length(formatted)
 
             # Extracting content rating
             movie.set_content_rating(data.get("contentRating"))
@@ -123,9 +126,6 @@ class IMDBScraper(Scraper):
         crit_review_url = url.get_url() + "criticreviews"
         resp = requests.get(crit_review_url, headers=self.headers)
         reviews_site = BeautifulSoup(resp.text, "html.parser")
-
-        with open("reviews.html", "w", encoding="utf-8") as f:
-            f.write(str(reviews_site))
 
         metascore_header = reviews_site.find("div", class_=re.compile(r'^sc-88e7efde-1'))
         movie.set_crit_avr_rating(metascore_header.text.strip())

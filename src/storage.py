@@ -46,7 +46,7 @@ class Storage(Observed):
             for outer_type_key, unprocessed_movies in self.scrapers.items():
                 if first:
                     for unprocessed_movie in unprocessed_movies:
-                        processed_movies.append(movie)
+                        processed_movies.append(unprocessed_movie)
                     first = False
                 else:
                     for unprocessed_movie in unprocessed_movies:
