@@ -1,10 +1,12 @@
 from src.data_structures.review import Review
 from src.data_structures.plataform import Plataform
+from rapidfuzz import fuzz
+import pandas as pd
 
 
 class Movie:
     def __init__(self) -> None:
-        self.url = ""
+        self.url = []
         self.title = ""
         self.genres = []
         self.release_date_theater = ""
@@ -22,11 +24,85 @@ class Movie:
         self.usr_reviews = []
         self.usr_rev_count = 0
     
+    # Overloaded ==
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Movie):
+            return NotImplemented
+        similarity = fuzz.ratio(self.title.lower(), other.title.lower())
+        limiar = 0.8
+        return similarity >= limiar
+    
+    def __ne__(self, other):
+        if not isinstance(other, Movie):
+            return NotImplemented
+        return not self.__eq__(other)
+    
+    def unite(self, other):
+        if not isinstance(other, Movie):
+            return NotImplemented
+        
+        movie = Movie()
+        
+        movie.set_title(self.title)
+        
+        movie.set_url(self.url)
+        for url in other.get_url():
+            movie.add_url(url)
+        
+        movie.set_genres(self.genres)
+        for genre in other.get_genres():
+            movie.add_genre(genre)
+
+        format = "%Y-%m-%d"  # TODO definir formato correto
+        release_date_s = pd.to_datetime([self.get_release_date_streaming(), other.get_release_date_streaming()], format=format, errors="coerce")
+        movie.set_release_date_streaming(release_date_s.min())
+        
+        release_date_t = pd.to_datetime([self.get_release_date_theater(), other.get_release_date_theater()], format=format, errors="coerce")
+        movie.set_release_date_theater(release_date_t.min())
+        
+        if len(self.get_synopsis()) >= len(other.get_synopsis()):
+            movie.set_synopsis(self.get_synopsis())
+        else:
+            movie.set_synopsis(other.get_synopsis())
+        
+        movie.get_length(self.get_length())
+        
+        # TODO Devemos ver se existem diretores diferentes entre sites?
+        movie.set_directors(self.get_directors())              
+        
+        movie.set_cast(self.get_cast())
+        
+        movie.set_platforms(self.get_platforms())
+        for other_plat in other.get_platforms():
+            for movie_plat in movie.get_platforms():
+                if movie_plat != other:
+                    movie.add_platform(other_plat)
+        
+        movie.set_content_rating(self.get_content_rating())
+
+        usr_avr_rating = (self.get_usr_avr_rating() + other.get_usr_avr_rating()) / 2
+        movie.set_usr_avr_rating(usr_avr_rating)
+        
+        movie.set_usr_reviews(self.get_usr_reviews())
+        for review in other.get_usr_reviews():
+            movie.add_user_review(review)
+        movie.set_usr_rev_count(self.get_usr_reviews_count() + other.get_usr_reviews_count())
+        
+        crit_avr_rating = (self.get_crit_avr_rating() + other.get_crit_reviews()) / 2
+        movie.set_crit_avr_rating(crit_avr_rating)
+        
+        movie.set_crit_reviews(self.get_crit_reviews())
+        for review in other.get_crit_reviews():
+            movie.add_critic_review(review)
+        movie.set_crit_rev_count(self.get_crit_reviews_count() + other.get_crit_reviews_count())
+
+        return movie
+       
     # Getters -----------------------
     def get_title(self) -> str:
         return self.title
 
-    def get_url(self) -> str:
+    def get_url(self) -> list[str]:
         return self.url
     
     def get_genres(self) -> list:
@@ -78,7 +154,7 @@ class Movie:
     def set_title(self, title: str) -> None:
         self.title = title
 
-    def set_url(self, url: str) -> None:
+    def set_url(self, url: list[str]) -> None:
         self.url = url
     
     def set_genres(self, genres: list) -> None:
@@ -127,6 +203,9 @@ class Movie:
         self.usr_rev_count = reviews_count
 
     # List insertion methods
+    def add_url(self, url: str) -> None:
+        self.url.append(url)
+
     def add_genre(self, genre: str) -> None:
         self.genres.append(genre)
 

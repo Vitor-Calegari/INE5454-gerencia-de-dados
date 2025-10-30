@@ -7,7 +7,7 @@ from pathlib import Path
 
 class Storage(Observed):
     
-    def __init__(self, threshold: int = 50) -> None:
+    def __init__(self, threshold: int = 1) -> None:
         super().__init__()
         self.scrapers = {}
         self.threshold = threshold
@@ -40,41 +40,59 @@ class Storage(Observed):
                 print("Nenhum filme armazenado.")
                 return
             
-            # Aqui você pode escolher o tipo (ex: URLType.ROTT)
-            # ou percorrer todos os tipos
-            for type_key, movies in self.scrapers.items():
-                for movie in movies:
-                    # Monta o dicionário do filme
-                    movie_dict = {
-                        "url": movie.get_url(),
-                        "titulo": movie.get_title(),
-                        "generos": movie.get_genres(),
-                        "data de lançamento nos cinemas": movie.get_release_date_theater(),
-                        "data de lançamento em streaming": movie.get_release_date_streaming(),
-                        "classificacao indicativa": movie.get_content_rating(),
-                        "sinopse": movie.get_synopsis(),
-                        "duracao": movie.get_length(),
-                        "diretor": ", ".join(movie.get_directors()),
-                        "cast": movie.get_cast(),
-                        "media_crit": movie.get_crit_avr_rating(),
-                        "reviews_crit": [
-                            {
-                                "avaliacao": r.get_rating(),
-                                "texto": r.get_text(),
-                                "data": r.get_date()
-                            } for r in movie.get_crit_reviews()
-                        ],
-                        "media_usr": movie.get_usr_avr_rating(),
-                        "reviews_usr": [
-                            {
-                                "avaliacao": r.get_rating(),
-                                "texto": r.get_text(),
-                                "data": r.get_date()
-                            } for r in movie.get_usr_reviews()
-                        ]
-                    }
+            processed_movies: list[Movie] = []
+            
+            first = True
+            for outer_type_key, unprocessed_movies in self.scrapers.items():
+                if first:
+                    for unprocessed_movie in unprocessed_movies:
+                        processed_movies.append(movie)
+                    first = False
+                else:
+                    for unprocessed_movie in unprocessed_movies:
+                        for processed_movie in processed_movies:
+                            if processed_movie == unprocessed_movie:  # Overloaded operator for similarity comparation
+                                movie = processed_movie.unite(unprocessed_movie)
+                                processed_movies.append(movie)
+            
+            for movie in processed_movies:
+                # Monta o dicionário do filme
+                movie_dict = {
+                    "url": movie.get_url(),
+                    "titulo": movie.get_title(),
+                    "generos": movie.get_genres(),
+                    "data de lançamento nos cinemas": movie.get_release_date_theater(),
+                    "data de lançamento em streaming": movie.get_release_date_streaming(),
+                    "classificacao indicativa": movie.get_content_rating(),
+                    "sinopse": movie.get_synopsis(),
+                    "duracao": movie.get_length(),
+                    "diretor": ", ".join(movie.get_directors()),
+                    "cast": movie.get_cast(),
+                    "media_crit": movie.get_crit_avr_rating(),
+                    "reviews_crit": [
+                        {
+                            "avaliacao": r.get_rating(),
+                            "texto": r.get_text(),
+                            "data": r.get_date()
+                        } for r in movie.get_crit_reviews()
+                    ],
+                    "media_usr": movie.get_usr_avr_rating(),
+                    "reviews_usr": [
+                        {
+                            "avaliacao": r.get_rating(),
+                            "texto": r.get_text(),
+                            "data": r.get_date()
+                        } for r in movie.get_usr_reviews()
+                    ],
+                    "plataforms": [
+                        {
+                            "plat_name": p.plataform,
+                            "url": p.link
+                        } for p in movie.get_platforms()
+                    ]
+                }
 
-                    data["filmes"].append(movie_dict)
+                data["filmes"].append(movie_dict)
 
             # Define o caminho do arquivo JSON
             output_path = Path("filmes.json")
