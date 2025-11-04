@@ -45,7 +45,7 @@ class Movie:
         
         movie.set_title(self.title)
         
-        movie.set_url(self.url)
+        movie.set_url([self.url])
         for url in other.get_url():
             movie.add_url(url)
         
@@ -65,7 +65,7 @@ class Movie:
         else:
             movie.set_synopsis(other.get_synopsis())
         
-        movie.get_length(self.get_length())
+        movie.set_length(self.get_length())
         
         movie.set_directors(self.get_directors())              
         
