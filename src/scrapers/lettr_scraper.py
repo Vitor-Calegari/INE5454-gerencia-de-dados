@@ -81,7 +81,7 @@ class LettrScraper(Scraper):
 
                 browser.close()
 
-            logging.info(movie.__str__())
+            # logging.info(movie.__str__())
             # self.storage.store_movie(movie, URLType.LTTR)
 
     def get_details(self, site):

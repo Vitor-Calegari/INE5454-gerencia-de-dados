@@ -124,9 +124,6 @@ class IMDBScraper(Scraper):
         resp = requests.get(crit_review_url, headers=self.headers)
         reviews_site = BeautifulSoup(resp.text, "html.parser")
 
-        with open("reviews.html", "w", encoding="utf-8") as f:
-            f.write(str(reviews_site))
-
         metascore_header = reviews_site.find("div", class_=re.compile(r'^sc-88e7efde-1'))
         movie.set_crit_avr_rating(metascore_header.text.strip())
          # encontra cada bloco de review (ajuste se necessário)
