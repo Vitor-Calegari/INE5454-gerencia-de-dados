@@ -7,22 +7,22 @@ import pandas as pd
 class Movie:
     def __init__(self) -> None:
         self.url = []
-        self.title = ""
+        self.title = None
         self.genres = []
-        self.release_date_theater = ""
-        self.release_date_streaming = ""
-        self.synopsis = ""
-        self.length = ""
+        self.release_date_theater = None
+        self.release_date_streaming = None
+        self.synopsis = None
+        self.length = None
         self.directors = []
         self.cast = []
         self.platforms = []
-        self.content_rating = ""
-        self.crit_avr_rating = 0
+        self.content_rating = None
+        self.crit_avr_rating = None
         self.crit_reviews = []
-        self.crit_rev_count = 0
-        self.usr_avr_rating = 0
+        self.crit_rev_count = None
+        self.usr_avr_rating = None
         self.usr_reviews = []
-        self.usr_rev_count = 0
+        self.usr_rev_count = None
     
     # Overloaded ==
     def __eq__(self, other) -> bool:
