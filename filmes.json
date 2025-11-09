@@ -8,10 +8,10 @@
                 "Sci-Fi"
             ],
             "data de lançamento nos cinemas": "1999-05-21",
-            "data de lançamento em streaming": "",
+            "data de lançamento em streaming": null,
             "classificacao indicativa": "14",
             "sinopse": "When a beautiful stranger leads computer hacker Neo to a forbidding underworld, he discovers the shocking truth--the life he knows is the elaborate deception of an evil cyber-intelligence.",
-            "duracao": "PT2H16M",
+            "duracao": "02:16:00",
             "diretor": "Lana Wachowski, Lilly Wachowski",
             "cast": [
                 "Keanu Reeves",
@@ -199,259 +199,559 @@
                     "data": "Mar 30, 2019"
                 },
                 {
-                    "avaliacao": "6",
+                    "avaliacao": "7",
                     "texto": null,
-                    "data": "May 29, 2017"
+                    "data": "Jan 31, 2023"
                 },
                 {
-                    "avaliacao": "4",
-                    "texto": "OK- don't get me wrong this was a groundbreaking movie. However I have some serious problems with it.First the good. The action scenes and special effects are awesome. They really did set new standards and knocked that hackneyed load of tripe The Phantom menace into the bin. The ending is also fantastic- there is no way that an ending this perfect was meant to be followed by two mediocre sequelsHowever, The plot is more full of holes than a fishnet stocking. For instance- I know this is nit picking- but how can Cypher be betraying the crew when not only do they have to plug him into the matrix for him to go and meet the agents in the first instance, but are also monitoring said conversation.Secondly- the philosophical parts. The matrix basically asks the question is it better to live the dream. The flaw comes in that in this case it is quite clearly better- great, so mankind is not \"free\" but each person lives a sufficiently realistic existence inside their own head for it not to matter. If the alternative is living in fear and squalor, dodging sentinels whilst eating what looks like congealed semen then I would frankly rather live inside my own dreams dining on fine food etc.Next up, the acting. Could someone please explain to me how Keanu Reeves is a leading man. He single handedly trashes all the good work put in by the supporting cast- especially Laurence Fishburne and Hugo Weaving. Anyway how can I be expected to take a film seriously where Keanu is effectively god?Overall, a reasonable film but not the second coming of Christ so many people think it is.",
-                    "data": "Feb 22, 2004"
+                    "avaliacao": "2",
+                    "texto": null,
+                    "data": "Aug 7, 2005"
                 },
                 {
                     "avaliacao": null,
                     "texto": "The first 45 minutes of this film had me very excited. It is so rare that I will go to the theater and be presented with something which is both original and intelligent. It managed to hang in there throughout, though the ending was too formulaic. In addition, the voice-over at the very end reminded me of the final scene in Saving Private Ryan. It almost ruins a fantastic film.The only other objection I can come up with is that the you must know, you must be type philosophy being handed out was just a tad hokey. I must pleasantly admit though, since I don't get to admit this very often, that The Matrix is worth seeing despite these things.The visuals are extremely impressive, particularly the \"white room,\" the baby harvester, the training scene with the \"red woman,\" the Reeves interrogation scene... I have to agree with some of the previous comments that the plot idea won't seem overly original to a fan of Philip K Dick, but then what is original after you've read him? The Matrix has more original things to say than two months worth of standard Hollywood fare. I have a great deal of respect for a film which will have someone say \"they're turning humans into this\" and hold up a battery. A plot which looks at man as machine will get a thumbs up from me just for trying.I feel some hope for the future of movie-making in America to be able to recommend this film.",
                     "data": "Apr 1, 1999"
                 }
+            ]
+        },
+        {
+            "url": "https://letterboxd.com/film/the-matrix/",
+            "titulo": "The Matrix",
+            "generos": [
+                "Science Fiction",
+                "Action"
             ],
-            "plataforms": [
+            "data de lançamento nos cinemas": "1999-05-21",
+            "data de lançamento em streaming": null,
+            "classificacao indicativa": null,
+            "sinopse": "Set in the 22nd century, The Matrix tells the story of a computer hacker who joins a group of underground insurgents fighting the vast and powerful computers who now rule the earth.",
+            "duracao": "02:16:00",
+            "diretor": "Lana Wachowski, Lilly Wachowski",
+            "cast": [
+                "Keanu Reeves",
+                "Laurence Fishburne",
+                "Carrie-Anne Moss",
+                "Hugo Weaving",
+                "Gloria Foster",
+                "Joe Pantoliano",
+                "Marcus Chong",
+                "Julian Arahanga",
+                "Matt Doran",
+                "Belinda McClory",
+                "Anthony Ray Parker",
+                "Paul Goddard",
+                "Robert Taylor",
+                "David Aston",
+                "Marc Aden Gray",
+                "Ada Nicodemou",
+                "Deni Gordon",
+                "Rowan Witt",
+                "Eleanor Witt",
+                "Tamara Brown",
+                "Janaya Pender",
+                "Adryn White",
+                "Natalie Tjen",
+                "Bill Young",
+                "David O'Connor",
+                "Jeremy Ball",
+                "Fiona Johnson",
+                "Harry Lawrence",
+                "Steve Dodd",
+                "Luke Quinton",
+                "Lawrence Woodward",
+                "Michael Butcher",
+                "Bernard Ledger",
+                "Chris Pattinson",
+                "Robert Simper",
+                "Nigel Harbach"
+            ],
+            "media_crit": null,
+            "reviews_crit": [],
+            "media_usr": "8.34",
+            "reviews_usr": [
                 {
-                    "plat_name": "Prime Video",
-                    "url": "https://www.primevideo.com/detail/amzn1.dv.gti.dea9f6b7-e0a0-38c9-7467-d6079c6fb4f0"
+                    "avaliacao": 8.0,
+                    "texto": "neo being woken up by a kiss officially makes him a disney princess, right?",
+                    "data": "2021-08-19"
                 },
                 {
-                    "plat_name": "HBO Max",
-                    "url": "https://play.max.com/video/watch/9fb854be-3d3c-44d8-a7c0-d3122b989be8"
+                    "avaliacao": 10.0,
+                    "texto": "When he jumps out to save Morpheus who isn’t gonna make it, and catches him then they reveal the chain he’s attached to, then the helicopter’s fuselage is shot, then trinity has to land them on the rooftop, then Neo rolls to a stop and realizes the woman he loves is stuck on the crashing helicopter and immediately shores up his strength on the cable, then trinity holds the cable and shoots its bearings, then jumps and the helicopter hits…",
+                    "data": "2019-12-22T22:36:32.837Z"
                 },
                 {
-                    "plat_name": "Prime Video",
-                    "url": "https://www.primevideo.com/detail/amzn1.dv.gti.dea9f6b7-e0a0-38c9-7467-d6079c6fb4f0"
+                    "avaliacao": 10.0,
+                    "texto": "i can also do a backflip",
+                    "data": "2021-12-07"
+                },
+                {
+                    "avaliacao": 9.0,
+                    "texto": "funny how the color green didn’t even exist until this masterpiece was released in 1999",
+                    "data": "2019-11-06"
+                },
+                {
+                    "avaliacao": 8.0,
+                    "texto": "Taking the red pill up my ass to shock Morpheus",
+                    "data": "2021-09-19"
+                },
+                {
+                    "avaliacao": 10.0,
+                    "texto": "Me and the boys calling each other by our gamertags in real life",
+                    "data": "2020-07-29"
+                },
+                {
+                    "avaliacao": 10.0,
+                    "texto": "BITCH I'M 20 YEARS LATE SHOOK",
+                    "data": "2019-08-17"
+                },
+                {
+                    "avaliacao": 9.0,
+                    "texto": "team blue pill all the way baby, we LOVE living in denial ladies",
+                    "data": "2019-03-31"
+                },
+                {
+                    "avaliacao": 10.0,
+                    "texto": "trinity: dodge this me, prolapsing: god is a woman",
+                    "data": "2017-08-01"
+                },
+                {
+                    "avaliacao": 10.0,
+                    "texto": "Holy fuck. Fuck me for not seeing this the day it came out. I mean I was only 2 years old, but that's just not a good enough excuse.",
+                    "data": "2016-04-14"
+                },
+                {
+                    "avaliacao": 9.0,
+                    "texto": "when i say this film is ahead of its time i mean it was 1 year before linkin park",
+                    "data": "2019-07-19"
+                },
+                {
+                    "avaliacao": 9.0,
+                    "texto": "thinking about how morpheus’ glasses don’t have arms",
+                    "data": "2021-11-05"
                 }
             ]
         },
         {
-            "url": "https://www.imdb.com/title/tt1375666/",
-            "titulo": "Inception",
+            "url": "https://www.rottentomatoes.com/m/matrix",
+            "titulo": "The Matrix",
             "generos": [
+                "Sci-Fi",
                 "Action",
-                "Adventure",
-                "Sci-Fi"
+                "Mystery & Thriller"
             ],
-            "data de lançamento nos cinemas": "2010-08-06",
-            "data de lançamento em streaming": "",
-            "classificacao indicativa": "14",
-            "sinopse": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., but his tragic past may doom the project and his team to disaster.",
-            "duracao": "PT2H28M",
-            "diretor": "",
+            "data de lançamento nos cinemas": "Mar 31, 1999, Wide",
+            "data de lançamento em streaming": "Jan 1, 2009",
+            "classificacao indicativa": "R",
+            "sinopse": "Neo believes that Morpheus, an elusive figure considered to be the most dangerous man alive, can answer his question -- What is the Matrix? Neo is contacted by Trinity, a beautiful stranger who leads him into an underworld where he meets Morpheus. They fight a brutal battle for their lives against a cadre of viciously intelligent secret agents. It is a truth that could cost Neo something more precious than his life.",
+            "duracao": "2h 16m",
+            "diretor": "Lilly Wachowski, Lana Wachowski",
             "cast": [
-                "Leonardo DiCaprio",
-                "Joseph Gordon-Levitt",
-                "Elliot Page",
-                "Tom Hardy",
-                "Ken Watanabe",
-                "Dileep Rao",
-                "Cillian Murphy",
-                "Tom Berenger",
-                "Marion Cotillard",
-                "Pete Postlethwaite",
-                "Michael Caine",
-                "Lukas Haas",
-                "Tai-Li Lee",
-                "Claire Geare",
-                "Magnus Nolan",
-                "Taylor Geare",
-                "Johnathan Geare",
-                "Tohoru Masamune"
+                "Keanu Reeves",
+                "Laurence Fishburne",
+                "Carrie-Anne Moss",
+                "Hugo Weaving",
+                "Joe Pantoliano",
+                "Gloria Foster",
+                "Marcus Chong",
+                "Paul Goddard",
+                "Robert Taylor",
+                "Julian Arahanga",
+                "Matt Doran",
+                "Belinda McClory",
+                "Anthony Ray Parker",
+                "Rowan Witt"
             ],
-            "media_crit": "74",
+            "media_crit": "83%",
             "reviews_crit": [
                 {
-                    "avaliacao": 100,
-                    "texto": "In terms of sheer originality, ambition and achievement, Inception is the movie of the summer, the movie of the year and the movie of our dreams.",
-                    "data": ""
+                    "avaliacao": "4.5/5",
+                    "texto": "Making a great film that's a psychedelic, kung-fu-inspired meditation on the human condition is a tall order. The Matrix delivers on all that & more.",
+                    "data": "Sep 27, 2024"
                 },
                 {
-                    "avaliacao": 100,
-                    "texto": "If Inception is a metaphysical puzzle, it's also a metaphorical one: It's hard not to draw connections between Cobb's dream-weaving and Nolan's filmmaking -- an activity devoted to constructing a simulacrum of reality, intended to seduce us, mess with our heads and leave a lasting impression. Mission accomplished.",
-                    "data": ""
+                    "avaliacao": "5/5",
+                    "texto": "“The Matrix” is the AI prophecy and wake-up call the human race is in dire need of. Watching the 2024 re-release is highly recommended.",
+                    "data": "Sep 25, 2024"
                 },
                 {
-                    "avaliacao": 100,
-                    "texto": "With physics-defying, thunderous action, heart-wringing emotion and an astonishing performance from DiCaprio, Nolan delivers another true original: welcome to an undiscovered country.",
-                    "data": ""
+                    "avaliacao": "5/5",
+                    "texto": "An amazing cocktail of martial arts, shootouts, philosophy, romance, fantasy, revolutionary visual effects and perfect casting. “The Matrix” surprised us 25 years ago, and it continues to surprise us in the Year of Our Lord 2024. Full review in Spanish.",
+                    "data": "Sep 21, 2024"
                 },
                 {
-                    "avaliacao": 90,
-                    "texto": "In a summer of remakes, reboots and sequels comes Inception, easily the most original movie idea in ages.",
-                    "data": ""
+                    "avaliacao": "",
+                    "texto": "The Wachowskis proceed to turn the world as we know it into a virtual reality landscape with a 20th century tech-noir look (lit with a sickly green hue, like the glow of an old IBM computer screen) and the physics of a video game.",
+                    "data": "Sep 9, 2023"
                 },
                 {
-                    "avaliacao": 88,
-                    "texto": "In this wildly ingen­ious chess game, grandmaster Nolan plants ideas in our heads that disturb and dazzle. The result is a knockout. But be warned: Inception dreams big. How cool is that?",
-                    "data": ""
+                    "avaliacao": "",
+                    "texto": "A $60 million, high-tech assault on the senses and a pretentious insult to the mind.",
+                    "data": "Jul 15, 2023"
                 },
                 {
-                    "avaliacao": 83,
-                    "texto": "As engrossing and logic-resistant as the state of dreaming it seeks to replicate, Christopher Nolan's audacious new creation demands further study to fully absorb the multiple, simultaneous stories Nolan finagles into one narrative experience.",
-                    "data": ""
+                    "avaliacao": "",
+                    "texto": "A cyberpunk thriller that's so much fun to watch, it could single-handedly reboot the genre.",
+                    "data": "Jul 13, 2023"
                 },
                 {
-                    "avaliacao": 80,
-                    "texto": "Inception, though, is no \"Avatar\"--instead, it’s the movie that many wanted \"Avatar\" to be. In a roaringly fast first hour, we’re introduced to a new technology that allows for the bodily invasion of another person’s dreamworld.",
-                    "data": ""
+                    "avaliacao": "",
+                    "texto": "The Wachowskis seem to be saying that while state-of-the-art effects speak for themselves, loud and clear, there's still room amid all the kicking and shooting and shouting for the carefully observed human emotion.",
+                    "data": "Jul 13, 2023"
                 },
                 {
-                    "avaliacao": 75,
-                    "texto": "Inception is an elegant, portentous ride, though I’m not sure Nolan is any closer to visualizing the real (dream) deal than Hitchcock was.",
-                    "data": ""
+                    "avaliacao": "2.5/4",
+                    "texto": "Though The Matrix ultimately overdoses on gloom-and-doom grunge, over-elaborate cool and especially running time, it's just clever enough to enable [the Wachowskis] to nix the sophomore jinx following 1996's Bound.",
+                    "data": "Jul 13, 2023"
                 },
                 {
-                    "avaliacao": 40,
-                    "texto": "Inception manages to be clunky and confusing on four separate levels of reality.",
-                    "data": ""
+                    "avaliacao": "",
+                    "texto": "I know almost nothing of the intricate techniques that make The Matrix as eye-filling as it is brain-numbing, but I can tell you that... [its visuals] are wondrous to behold.",
+                    "data": "Jul 13, 2023"
                 },
                 {
-                    "avaliacao": 30,
-                    "texto": "It's obvious that Nolan either can't articulate or doesn't believe in a distinction between living feelings and dreams--and his barren Inception doesn't capture much of either.",
-                    "data": ""
+                    "avaliacao": "3/5",
+                    "texto": "If you're looking for a good spring fix of existentialist sci-fi, look no further than The Matrix -- then do everything you can to look deeper than the skin-tight surface.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": "4/5",
+                    "texto": "Although it's sometimes too confounding for its own good and a little heavy on the Zen-inspired techno-babble, The Matrix is a consistently absorbing assault on the senses.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": "",
+                    "texto": "There's more form than content in The Matrix, but Bill Pope's swooping, noir-inflected cinematography is wonderfully complemented by Owen Paterson's inventive production design, a great soundtrack and the best fight choreography this side of Hong Kong.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": "3/4",
+                    "texto": "Give [the Wachowskis] an A for effort and three A's for those effects. The Matrix is a dazzlingly original visual adventure.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": "1/4",
+                    "texto": "Casting the robotic Reeves as the hope of humanity may be this oppressively long, self-satisfied movie's funniest gag, but it doesn't really make the game any fun. It means we get stuck with the least interesting player.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": "2.5/4",
+                    "texto": "The Matrix's pleasures are considerable, but they're all purely visceral, too, lacking the mythology that would have elevated the movie. The movie is best taken as the first entry in a brand-new genre: post-modern sci-fi pulp.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": "",
+                    "texto": "How could filmmakers who are so skilled and imaginative lose themselves (and us) in what feels like a college stab at Aldous Huxley metaphysics?",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": "2/5",
+                    "texto": "A futuristic paranoia extravaganza, it would seem to have far more appeal to an artificial intelligence than it would to human beings and other carbon-based life forms.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": "2.5/5",
+                    "texto": "An interminable, sterile, exercise in cinematographic onanism.  [Full review in Spanish]",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": "B",
+                    "texto": "Like last year's Dark City, the effects and storyline of The Matrix plow through enough fresh territory to make it worth seeing.",
+                    "data": "Jul 13, 2023"
+                },
+                {
+                    "avaliacao": "2.5/4",
+                    "texto": "Visually, at least, The Matrix more than lives up to its billing. Writer-directors [the Wachowskis] seem to literally bring the screen to life with action scenes that define the word kinetic.",
+                    "data": "Jul 13, 2023"
                 }
             ],
-            "media_usr": 8.8,
+            "media_usr": "85%",
             "reviews_usr": [
                 {
-                    "avaliacao": "10",
-                    "texto": null,
-                    "data": "Feb 28, 2019"
+                    "avaliacao": 5.0,
+                    "texto": "amazing acting, action and visuals. It is a must see classic no matter what movies you like",
+                    "data": "Nov 8, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": "Few films leave you genuinely questioning whether you truly understood them quite like Inception does. The cast is outstanding, the story itself feels like a puzzle you can't stop trying to solve, and the music subtly pulls you deeper without overpowering the experience. All of this has drawn me back to watch the movie at least five times over the years - and I know I'm not done yet.I've always admired Leonardo DiCaprio, and in this film, it feels like he poured everything he had into the role. All that's left for me now is to keep hoping that someday, we'll get a second part.So, keep dreaming....",
-                    "data": "Jun 30, 2025"
+                    "avaliacao": 5.0,
+                    "texto": "This movie was ahead of its time. A classic master piece with quality actors.",
+                    "data": "Nov 8, 2025"
                 },
                 {
-                    "avaliacao": "9",
-                    "texto": null,
-                    "data": "Aug 21, 2010"
+                    "avaliacao": 3.5,
+                    "texto": "Cool action movie.... although a bit flawed.....",
+                    "data": "Nov 6, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": "You only get to watch this for the first time once, so choose your state of mind carefully.\nIt is a film about movies and dreams and reality, and what sort of life it is best to find when you leave the cinema and return to whatever you left to enter.\nIt is spectacular, and brutal, and enigmatic and disturbing.\nIt is beautiful and absorbing.\nIt is about one of my favourite characters ever to grace the screen.\nI don't see it often, in case it's not as good as I like to remember it.\nThat is my secret, that I lock away in my safe in the basement.\nThat somewhere there is a perfect world for us all.\nFor some, perhaps it is in the cinema watching this.",
-                    "data": "Dec 21, 2020"
+                    "avaliacao": 4.0,
+                    "texto": "Fun and clever movie.",
+                    "data": "Nov 1, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": "When you wake up from a good dream, you feel the reality is harsh. When you wake up after a bad dream, you will be sentimentally attached to the beauty of reality. But as long as life is good, reality and dreams don't matter.",
-                    "data": "Aug 8, 2021"
+                    "avaliacao": 0.5,
+                    "texto": "Wish I could give this pretentious pile of crap Zero Stars.",
+                    "data": "Oct 31, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": "The 20th Century had Casablanca, Star Wars, the Godfather, Blade Runner, and others - this is the first of the 21st Century masterpieces. Truly in awe at how amazing this movie is, an astounding show of all aspects of films. Amazing story and cinematography accompanied with actors worthy of telling the tale. Remarkable and breathtaking.",
-                    "data": "Nov 14, 2021"
+                    "avaliacao": 4.0,
+                    "texto": "One of the most iconic movies of my generation\n\nFor a movie made in the late ’90s, The Matrix has absolutely incredible production value. The visual effects and animation techniques were way ahead of their time — the slow-motion “bullet time” shots and slick fight choreography still hold up amazingly well today. It’s one of those films that completely changed the game for action and sci-fi movies.\n\nFrom start to finish, The Matrix keeps you on the edge of your seat. The story is mind-bending, the pacing is perfect, and the atmosphere pulls you deep into its futuristic world. It’s one of those rare movies that makes you think while still delivering nonstop entertainment.\n\nOverall, I’d give The Matrix a solid 4 stars. It’s stylish, thought-provoking, and packed with action — an iconic film that still feels fresh decades later.",
+                    "data": "Oct 28, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": null,
-                    "data": "Jul 9, 2010"
+                    "avaliacao": 4.5,
+                    "texto": "OK, so it's a bit surf dude nonsensical, but it's a great idea and an even greater spectacle. It really doesn't make sense on any level but as long as you don't mind that, you can just enjoy the ride.",
+                    "data": "Oct 27, 2025"
                 },
                 {
-                    "avaliacao": "7",
-                    "texto": "There is no doubt that Nolan is a very talented director, and I like a lot of his films, but sadly I think like a number of other hugely successful directors before him (Peter Jackson springs to mind) his success has led to a detrimental degree of freedom for him to churn out his own poorly-written scripts unchecked, and make films that are about an hour longer than they need to be.I know I'm swimming against the tide of public opinion here, but while I was hugely excited about seeing Inception back when it came out, I was absolutely crushed on first viewing. I found it terribly written (the film begins with enough exposition scenes to fill a normal film's running time!), incomprehensible (editing was all over the place, action dull and repetitive), visually disappointing (all the best bits were revealed in the trailer and were all contained in the exposition scenes rather than having anything to do with the story) and with a concept that just didn't hold water (the dream sequences seemed to always resemble Matrix out-takes and were held together by a logic that just wasn't very dream-like)!Perhaps if Nolan had a studio breathing down his neck and someone to revise his shaky script this could have turned out well, but after the success of TDK he can effectively write his own ticket and is (sadly) free to churn out this kind of lazy and self-indulgent snooze-fest. The same thing happened with Peter Jackson after LOTR with King Kong (an hour too long, too much freedom etc.)Hans Zimmer's incredible score was about the only positive I took out of Inception (Zimmer's brilliant scores are increasingly the glue that holds Nolan's films together and makes them seem better than they are). Despite his obvious talents and love of film (I love him for shooting Batman stuff in IMAX 70mm!) Nolan has some very bad habits (mainly relying on his and his brother's writing) which I think really hamper his films these days. I loved TDK, but it frustrates me in almost equal measure, and though I haven't seen The Dark Knight Rises yet, I will go in with very low expectations based on his apparently dwindling form.",
-                    "data": "Jul 25, 2012"
+                    "avaliacao": 5.0,
+                    "texto": "This movie was built to mastery. There is so much brilliance that went into asking some very deep questions about life, creation and so many other spiritual mysteries. Extremely well done and highly enjoyable. This movie was so far ahead of its time that no other film series has been able to dig this deep on asking some very important questions. Very nice balance between story and integrating technical action scenes. Very well done. One of my very favorite movies of alll time",
+                    "data": "Oct 27, 2025"
                 },
                 {
-                    "avaliacao": "4",
-                    "texto": null,
-                    "data": "Jun 13, 2013"
+                    "avaliacao": 5.0,
+                    "texto": "One of the greatest movies ever.",
+                    "data": "Oct 23, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": "When I first watch this movie, I was just shocked with it's twist. I'm not gonna mention details, because can't share any spoilers.Simply this movie makes a complex story, that makes you question so many things. \"Why he is keeping her in his dreams?\" or whatever your question is answering with some well written line. That scene is the key to the whole movie. That line between Cobb and Mal answers all your questions at once.That's why I like this movie so much. Some movies has that potential. Making a complex story that someone could answer with only one sentence. You're waiting for that line for whole content. But most of the contents (I mean movie or TV Series) are not managing that well.Besides the greatness of the storyline this movie has a really great cast. So Acting Performances are also great. Award Winning Cinematography by Wally Pfister was too great. Original Scores by Hans Zimmer was brilliant. Visual Effects are unique. So not only the Screenplay but nearly all the technical details are great.",
-                    "data": "Mar 1, 2023"
+                    "avaliacao": 5.0,
+                    "texto": "Best AI Take Over + Action movie ever created. Just watch it if you haven't. There were so many industry standards set with this movie. If you don't like it, there's probably something wrong with you and you should see a professional about it. :)",
+                    "data": "Oct 21, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": null,
-                    "data": "Feb 7, 2020"
+                    "avaliacao": 5.0,
+                    "texto": "One of the best movies ever made.",
+                    "data": "Oct 16, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": null,
-                    "data": "Jul 14, 2010"
+                    "avaliacao": 4.5,
+                    "texto": "The Matrix is a science fiction film about Neo, a hacker who discovers that he is in a simulation, and joins a group a rebels to fight to save humanity. The movie has an interesting story, great acting, amazing visuals, and special effects that still hold up with today's standards. Overall, I would give it a 9.5, definitely one of the best films I've watched.",
+                    "data": "Oct 15, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": "Inception is my number one favorite movie off my twelve years on earth! It's absolutely impossible to explain the incredible that Inception has. Inception is Sooooooooo dang exciting, edge of seat, mind blower, and I wish there were more movies like it and more Christopher Nolans out there. Congratulations to the well deserved best director, writer, and producer of films (in my opinion). Also the acting is fabulous, everyone did an amazing job, and Leonardo was fabulous at explaining the dream concept. Also the CGI and effects are amazing. Go watch Inception because it is incredibly amazing in every aspect, and is my number one film of my twelve years on earth. Bravo to the Inception crew and wow at this fabulous movie!",
-                    "data": "Jun 3, 2021"
+                    "avaliacao": 5.0,
+                    "texto": "To be honest, one of the best sci-fi movies I've ever seen because it really go through the question of \"do we really live in the world we live in\", really thought-provoking  and well paced : everything isn't explained and laid out to you : you have to follow the storyline and understand by yourself (more immersive than usual Sci-fi movies).  It aged a bit, yeah, but still have impressive effects and CGI is really specific at this movie, a revolutionnary futuristic style with new ways of editing (at the time it was published). The music is also more original than usual with Rage Against The Machine and electro/grunge music that really goes well with the overall atmosphere. \n And surprisingly, the following movies are as good as this one (maybe less impressive because effects were less surprising) with a well-thought storyline and effects obviously.",
+                    "data": "Oct 9, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": null,
-                    "data": "Jul 12, 2010"
+                    "avaliacao": 4.5,
+                    "texto": "so really good. and it's the best.",
+                    "data": "Sep 30, 2025"
                 },
                 {
-                    "avaliacao": "9",
-                    "texto": "Inception is a beautiful piece of film that has impacted a large part of the film industry. With everything from the actors to the cinematography to the music, this movie without any elaboration perfected almost everything there is.Inceptions slow start is the only weak point of this movie. It begins intensely to then slows down for the next 20 - 30 minutes. While then finishing off as an impeccable film. Nevertheless, this is what brings the film down for me.The director Christopher Nolan managed to create a masterpiece with little to no mistakes. At no point during this intensely long movie did I feel bored. Instead, I was always excited and on my toes intrigued.The acting in this movie was phenomenal. A small number of great actors that all had their character arc while also doing incredible performances. It is truly beyond me how Dicaprio didn't win an Oscar for his performance.Meanwhile, also employing the greatest composer in history with Hans Zimmer, the music adds significantly. The music adds an extreme amount of excitement and keeps you constantly interested. Few composers can make you notice the music, but Zimmer succeeds per usual.To finish of the film was astonishingly shot. With beautiful eye-catching scenes. While also containing some incredible action scenes that might be some of the best action I've seen. With a thought-provoking storyline that finishes of with an unbelievable ending.I highly recommend Inception to everyone and I promise you won't be disappointed.",
-                    "data": "Nov 22, 2021"
+                    "avaliacao": 5.0,
+                    "texto": "It was absolutely incredible on the big screen!!! I didn’t get to see it on its initial run, but I didn’t see the sequels.  This was a full circle moment and I’m so glad I got to experience as the director’s intended it to be.",
+                    "data": "Sep 28, 2025"
                 },
                 {
-                    "avaliacao": "6",
-                    "texto": null,
-                    "data": "Jul 19, 2010"
+                    "avaliacao": 5.0,
+                    "texto": "Greatest movie of my time",
+                    "data": "Sep 20, 2025"
                 },
                 {
-                    "avaliacao": "5",
-                    "texto": null,
-                    "data": "Jun 20, 2012"
+                    "avaliacao": 5.0,
+                    "texto": "The matrix is a Extremely important piece of cinema. It was shot pre 911. It had come just 2 years before star wars rebooted episode 1. Amd, It was badass. The whole comcelt was something I nyself truly thought up once. Completely differe t vision for the film. Bjt i still had this film in my mind. I gill this day in 2025 say its the best film rver. Msde handd down bh a mile. Watch this m ow!!!!!",
+                    "data": "Sep 18, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": "Inception is truly one of a kind. A concept which has long gestated in Christopher Nolan's mind, his eye for drama mixed with his large scale sensibilities ring true in Blockbuster season making Inception a true original in the sea of reboots, remakes and sequels.To try and explain Inceptions many plot twists and incredibly intelligent arcs, would be a foolish task. As Nolan himself has been reluctant to. The best way to approach the film would be with an open mind, if you are prepared to be taken on a ride of a lifetime, then trust that you 100% will. If Avatar was a seminal film in technology (although coming out as a rather poor film, in my opinion), then Inception is seminal in it's storytelling. With a 148 minute running time, you would expect a lot to take place, but what you wouldn't expect is the pace of it all. I did not think at one time in the film about how long was left. I was simply blown away by the depth in every single part of the film. If my enthusiasm for the storytelling aspect of the film has left you worried about the spectacle, then don't worry. They are, as hinted in the trailer, incredible, looking real and unbelievable simultaneously. The most pleasing thing about the action set pieces, is that they are genuinely used to illustrate the story, rather than to blow stuff up a la Michael Bay.With this complex movie in it's high concept, a stellar cast is needed. And Nolan as always, delivers with just that. This is vintage DiCaprio, perhaps only equalled in The Aviator, which is even more impressive as his role as Cobb in Inception is not a showy one, needing DiCaprio to be the constant at the centre of the film. And he pulls off Cobb's emotional contradictions sublimely. The rest of the cast members all shine in parts of the films, Cillian Murphy shows off his usually non-existent tender side, Gordon-Levitt bottles his usual charm for his confidently reserved turn as the reliable Arthur, Watanabe is devilish as the seemingly ambiguous Saito, Page shows why she's the next big female star and Tom Hardy revels in being the comic relief of the film compared to his recent turns as decidedly psychopathic characters.Overall, Nolan has indeed surpassed himself. He has created a world as expansive as his Gotham, a plot dwarfing the intricacies of Memento and one which blows The Prestige's cinematic reveal out of the water. This is truly unmissable cinema. Revel in it, we've still got to wait a whole two years before Batman 3.",
-                    "data": "Jul 12, 2010"
+                    "avaliacao": 4.0,
+                    "texto": "The ai predict thing is kinda cool",
+                    "data": "Sep 7, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": "I saw Memento very recently, something that turned out to be a great miss.I saw it again, just to make a couple of thins straight-and i'll definitely do the same with Inception.Christopher Nolan keeps improving himself, with even more complex and multilayer script like this.And i thought Memento was hard to reach by most of the viewers, but no.Inception will keep you mesmerized and captivated by the genius, that's hidden behind it.And not just directors and screenwriters (or with other words-Nolan), but with acting and sound-and effects and editing as well.When you have a cast like this-i mean Leonardo DiCaprio, Joseph Gordon-Lewitt, Michael Caine, or Marion Cotillard (a personal favourite), the movie just keeps going flawlessly.Most of the crew is the same the Nolan brothers worked with on TDK and earlier in Batman Begins.So the Oscar noms in those categories are a certainty for me.The only thing one could have against the movie, is the headache one could have.See, most of my friends go to the movies for brainless action, they enjoyed Iron Man 2 and The A-Team, but this movie-you have to see it at least twice, to understand it.The levels and the layers on which thing are happening are so many, that one surely'll miss something vital.This is a reason for not fitting to the mass audience, but i hope that won't happen, because Nolan is one of my favourite directors/writers, and he showed, that the brainless action flicks aren't all of it.There are still movies like Inception out there and still people like the Nolans to make those movies, so it's not all lost.And i hope this movie could show the audience that the story is still important for the experience one could receive, not the endless, constant explosions.Because this is really a one of a lifetime event.Saying that, i must say, that in a world full of remakes, reboots, sequels, prequels and God knows what, this is a unique chance to see something different and unmatched so far-a strong movie, that, surely will be Nolan's latest masterpiece! My Grade won't change-it's the same for all Nolan movies-sheer 10!",
-                    "data": "Jul 8, 2010"
+                    "avaliacao": 5.0,
+                    "texto": "The Matrix is one of those movies that everyone should probably see. The cultural impact that this movie has had on the world (in both good and bad ways) is completely incomparable. There are people out there that think the undertones of spiritual and world views in this film are actually real. The action in this movie is amazing, and the story in peak. If you haven't seen this yet, now is the time.",
+                    "data": "Aug 30, 2025"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": "I had the privilege of seeing this movie before it came out, and, like most of DiCaprio's films, it blew me away.Inception is a well-made movie, filmed in about 6 locations all over the world. The directing was outstanding, there were only about two moments, maybe three seconds in total, where i noticed that visual effects were being used (of course defying gravity is pretty difficult).The plot was very pleasingly intricate, with a twist-and-turn, keep-you-on-the-edge-of-your-seat type feel. I noticed that this film had similarities with DiCaprios thriller Shutter Island (which i also enjoyed very much)seeing as it left you wondering what was real and what was not. It's great to see a movie with a thick and emotional plot and not just grenade-throwing action heroes who achieve greatness in the end.Inception also has a very well-composed score, which to me was the finishing touch to a perfect movie. If you're thinking about seeing Inception, definitely go! Even though i was fortunate enough to see a free show, it is worth every penny you pay.Truly unique, like nothing i've ever seen before. Christopher Nolan certainly covered new ground with this film and wasn't afraid to leave us hanging with a spectacular ending.",
-                    "data": "Jul 11, 2010"
+                    "avaliacao": 5.0,
+                    "texto": "An amazing movie in the year of amazing movies, 1999 was perfect",
+                    "data": "Aug 30, 2025"
+                }
+            ]
+        },
+        {
+            "url": "https://www.rottentomatoes.com/m/replicant",
+            "titulo": "Replicant",
+            "generos": [
+                "Action",
+                "Mystery & Thriller",
+                "Sci-Fi"
+            ],
+            "data de lançamento nos cinemas": "",
+            "data de lançamento em streaming": "Mar 1, 2007",
+            "classificacao indicativa": "R",
+            "sinopse": "Detective Jake Riley (Michael Rooker) is on the trail of serial killer Edward \"The Torch\" Garrotte (Jean-Claude Van Damme), who murders mothers and sets them ablaze after they're dead. Nearing retirement, Riley is removed from the case but is soon contacted by a government agency that has created a clone of Garrotte using a secret technology. The replicant (also Van Damme) teams with Riley to help track down the killer, but despite the novel approach, Garrotte will be hard to stop.",
+            "duracao": "1h 37m",
+            "diretor": "Ringo Lam",
+            "cast": [
+                "Jean-Claude Van Damme",
+                "Michael Rooker",
+                "Catherine Dent",
+                "Ian Robison",
+                "Brandon James Olson",
+                "Pam Hyatt",
+                "Allan Gray",
+                "Jayme Knox"
+            ],
+            "media_crit": "27%",
+            "reviews_crit": [
+                {
+                    "avaliacao": "4/10",
+                    "texto": "The finale, drawn out and exceptionally bloodthirsty, is moderately satisfying – even if terribly unrealistic, which matches the nonsensical parting shots.",
+                    "data": "Sep 25, 2025"
                 },
                 {
-                    "avaliacao": "9",
-                    "texto": "There are those who seek to dive into your mind, take your secrets and whatever else they find, espionage, conspiracy, infiltration, skulduggery, through worlds that are all conjured, well designed. They've been asked to plant a seed, start an idea, change the course of an industrialists career, but it needs dreams within deep dreams, an architect to build the schemes, and the consequences, could be quite severe.Imaginative beyond words, elegantly crafted and constructed, presented and performed by legends of the screen with a great storyline that keeps the viewer constantly engaged and on the edge of their seat - what more do you want out of movies.",
-                    "data": "Mar 30, 2023"
+                    "avaliacao": "2.5/4",
+                    "texto": "The action sequences are well staged and credit where credit is due: The 40-year-old martial artist still has the physical goods, executing 180 splits and gymnastic stunts with the grace and apparent ease of someone much younger.",
+                    "data": "Nov 2, 2008"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": "Usually I try to be careful with over hyping a film, or setting the expectations too high, as film geeks all are guilty for, however for Christopher Nolan's Inception, this really is not possible.This is possibly one of the only perfect films I have ever seen. It is absolutely confident in every way, something which is extremely refreshing, even more so than Avatar. Christopher Nolan gets some slack for making great to look at but ultimately heartless affairs, which I for one do not agree with, however I do not think anyone can argue that here. The emotional aspect of this film not only ties it all together but is really the centre of this film, it is the focus.I do not want to over simplify the film, by simply calling it Kubrick doing Bond, or Gondry on a huge budget, because I am sure it will be called that but it is far more than that, it is something I do not think Kubrick could have ever made. It is pure Nolan, and pure greatness.I hate writing something which is pure fan-boy gushing, but its really difficult here. I did not find a thing I did not like about it, I am sure if maybe I saw it a second time, maybe I would find something about it I didn't like, but not the first time. The way it is cut, means that there is always action on screen, if not, then the visuals are interesting enough to keep your eyes glued.The final hour of the film, is possibly one of the most complicated action sequences put on film. You have to constantly be paying attention to remember all of the layers of what is happening. Without spoiling anything, all I have to say is that is what this film is about, that is what makes this film so great, layers. Once you have seen this you will now what I am talking about.All of the actors are fantastic too, Di Caprio is the stand out here. Yes, this is probably due to the fact he is the star and given all of the emotional weight, but he handles it perfectly, similarly to his performance in Shutter Island. Ellen Page, whom I usually hate, gives a great performance here. Tom Hardy gives a break out performance here, he is quite the bad ass.I hope audiences are ready for a film like this, a pure auteur driven film which does not sacrifice a single frame for the studio. I would hope this film will change Hollywood, as it is 100 percent the directors vision yet it is definitely a marketable film, much like District 9, yet I do not think it will.I cannot recommend this film anymore than I have, I just have to say everyone and anyone should see it. Sorry about all the gushing, it is just so hard not too.If you liked this review check out my new film blog: http://thedeletedscene.wordpress.com",
-                    "data": "Jul 11, 2010"
+                    "avaliacao": "2/5",
+                    "texto": "",
+                    "data": "Oct 9, 2005"
                 },
                 {
-                    "avaliacao": "10",
-                    "texto": null,
-                    "data": "Jul 11, 2010"
+                    "avaliacao": "2/5",
+                    "texto": "",
+                    "data": "Aug 14, 2005"
                 },
                 {
-                    "avaliacao": "8",
-                    "texto": "I'm nearly at a loss for words. Just when you thought Christopher Nolan couldn't follow up to \"The Dark Knight\", he does it again, delivering another masterpiece, one with so much power and rich themes that has been lost from the box office for several years. Questioning illusions vs reality usually makes the film weird, but Nolan grips your attention like an iron claw that you just can't help watching and wondering what will happen next. That is a real powerful skill a director has. No wonder Warner Bros. put their trust in him, he is THAT good of a director, and over-hyping a Christopher Nolan film, no matter what the film is about, is always an understatement instead of an overestimate like MANY films before.Not since the eras of Stanley Kubrick, Andrei Tarkovsky and Alfred Hitchcock has there been a more brilliant director than Christopher Nolan. He is, undoubtedly, one of THE most brilliant and gifted Hollywood filmmakers in history. Filmmakers like him come but just once in a lifetime. He has the ability to seduce our eyes, ears and most importantly, mind, and then delivers what he intends to deliver in full blast. Rarely have blockbusters have the gall to deliver such amounts imagination and intelligence at the same time. And yes, it is similar to the excellent anime film \"Paprika\" in the whole \"invading dreams\" plot, but the similarities end there as Nolan brings the film to a whole different level.Visuals and intelligence rarely come together in movies at the same time, it's either all-visuals-no-smarts (\"G.I. Joe\", \"Transformers\") or the exact opposite (\"Doubt\", \"Invictus\"). In this film the excellently directed action sequences combined with immensely groundbreaking and jaw-dropping visual effects are combined smoothly with a heavy dose of intelligence and believability.Although having an ensemble cast and financed by a Hollywood giant studio (Warner Bros), this film is a very personal film for Nolan, he wrote the film as well as directing it, and as you watch the film you get many glimpses of Nolan's perplexing, increasingly imaginative thoughts and dreams in the dialog that he writes and the plot that he sets up. Ideas have never felt more interesting and put to good use than in this film. This film is NOT for the popcorn muncher, rather it is a film for thinkers. Honestly I can't explain the plot for fear of spoiling the movie for you readers. Even the slightest hint will ruin the experience. The viewer will walk out of the cinema feeling dazed, confused and ultimately breathless. It's like a puzzle, both physically and mentally, and you have to pay attention throughout the film for the clues. However Nolan controls the spectacle of the film and is careful not to let it overwhelm the film's humanity, and this is where \"Inception\" shines. It is a very deep film that will have one thinking and asking questions for years to come. That's right, years.Once the film ends, you'll want to watch it again, for there's something new every time. This is a film that requires multiple viewing for someone to truly comprehend the film's ambiguous themes, and will be discussed by many in the future. This is an original film, no adaptation, no sequel/prequel, no remake/reboot, which is extremely refreshing having gone nearly three years of mostly unremarkable visual effects roadshows (\"Avatar\" be damned).Of course, a film is not complete without the actors. Leo DiCaprio delivers an Oscar worthy performance, similar but better than his previous effort \"Shutter Island\". He shows glimpses of a flawed, grim, fragile man, who has knowledge about everything else but yet can't seem to come in grips with himself and his demons. Joseph Gordon-Levitt, Ellen Page, Tom Hardy, Ken Watanabe, Dileep Rao, Cillian Murphy, Tom Berenger, Michael Caine, Marion Cottilard, Pete Postlethwaite, Lukas Haas... Nolan really brings out the best in this unusual yet extremely talented group of supporting actors who make their roles their own.Nolan is of course, a master behind the camera, a real virtuoso when it comes to film. His direction is taut, focused, gripping, and extraordinarily fascinating. The detailed and complex original script is no surprise from Nolan, considering the fact that he turned Batman the superhero into pop-culture art two years ago (\"The Dark Knight\"). The action sequences are unique, exciting and fresh, something absent from the cinema which has since been interested at things popping towards the screen and stuff blowing up every two milliseconds. The visual effects are awesome and imaginative, and best of all they do not bring down the movie's quality one bit, rather it makes the movie more fascinating to watch. The cinematography is absolutely, beautifully shot, so we can see the action and emotion in all their glory. Production design is top notch, with terrific design of sets and locations. Hans Zimmer's complementing music score is simply outstanding, and knowing the man, that's really all I have to say. Together all of these elements combine to deliver a mesmerizing movie experience like no other this year.Christopher Nolan has once again outdone himself. He truly is a gifted filmmaker, arguably the most imaginative in Hollywood today. And \"Inception\" can proudly stand alongside \"Blade Runner\" and \"2001: A Space Odyssey\" as science-fiction masterpieces that push the boundaries for movie making and become a different experience altogether.There are two types of films: the crowd-pleasing blockbuster and the intelligent indie/art film. Nolan has combined two of these tropes together into one exceptionally brilliant package, pulling off that rare, now nearly-extinct Movie Magic that has since been wiped off the planet by sequelitis and reboots. Movie of Summer 2010? Movie of 2010? Heck this is possibly the first masterpiece of the decade! Nolan is a genius and I applaud him for treating his audiences as intelligent people.Missing this film and not getting the film's point is a crime.Overall value: 9/10 (Excellent)",
-                    "data": "Jul 14, 2010"
+                    "avaliacao": "3/5",
+                    "texto": "",
+                    "data": "May 6, 2005"
                 },
                 {
-                    "avaliacao": "4",
-                    "texto": null,
-                    "data": "Jan 25, 2011"
+                    "avaliacao": "2/5",
+                    "texto": "Slightly less awful than most of Van Damme's efforts.",
+                    "data": "Apr 3, 2005"
+                },
+                {
+                    "avaliacao": "0/5",
+                    "texto": "Low budget and low thought exploration of promising idea",
+                    "data": "Sep 16, 2004"
+                },
+                {
+                    "avaliacao": "2/4",
+                    "texto": "Replicant doesn't even come close to some of Van Damme's better flicks (Timecop and Sudden Death), but it's certainly an improvement over what he's been up to lately.",
+                    "data": "May 7, 2003"
+                },
+                {
+                    "avaliacao": "C+",
+                    "texto": "I was surprised to find \"Replicant\" wasn't too bad at all.",
+                    "data": "Sep 24, 2002"
+                },
+                {
+                    "avaliacao": "58/100",
+                    "texto": "People looking for a movie that offers conversational debate on a controversial dilemma should look beyond this one-dimensional decoy.",
+                    "data": "Dec 8, 2001"
+                },
+                {
+                    "avaliacao": "2/4",
+                    "texto": "The whole trying affair is irresistibly dopey. Kinetic, too.",
+                    "data": "Oct 19, 2001"
                 }
             ],
-            "plataforms": [
+            "media_usr": "37%",
+            "reviews_usr": [
                 {
-                    "plat_name": "HBO Max",
-                    "url": "https://play.max.com/video/watch/aaf706ec-46a1-4453-bb69-293452009004"
+                    "avaliacao": 0.5,
+                    "texto": "Filme mais ou menos, o roteiro é fraco, as cenas são mais ou menos, a história é fraca, o elenco é fraco, e ninguém ajuda a melhorar o filme, os personagens são fracos, e o filme deveria ter cenas bem melhores e relevantes, para fazer o filme ser bom",
+                    "data": "Jun 15, 2025"
                 },
                 {
-                    "plat_name": "Prime Video",
-                    "url": "https://www.primevideo.com/detail/amzn1.dv.gti.a56a434f-4511-4e0a-88b9-72c2194f53cf"
+                    "avaliacao": 0.5,
+                    "texto": "What’s better than one van damme ? We already know, double impact showed us exactly what…. these toooze can do. Except one is a bingo. The road twitch brought him a coat after, he destroyed her place, and he never said one word to her. Phile.",
+                    "data": "Apr 18, 2025"
+                },
+                {
+                    "avaliacao": 1.5,
+                    "texto": "Do not waste your time, I can’t believe this got any good reviews at all, premise is pretty stupid, but the acting is worse.",
+                    "data": "Mar 8, 2025"
+                },
+                {
+                    "avaliacao": 1.5,
+                    "texto": "Not only was he a 'bad boy', it was a very bad film.",
+                    "data": "Jul 17, 2023"
+                },
+                {
+                    "avaliacao": 3.5,
+                    "texto": "An unusual strong performance for Van Damm, I would say if the premise doesn't at least interest you, watch it for his performance alone.  Recommended for action fans",
+                    "data": "Jul 24, 2020"
+                },
+                {
+                    "avaliacao": 3.5,
+                    "texto": "The action is cool and JCVD gives one of his best performances.",
+                    "data": "Jul 1, 2020"
+                },
+                {
+                    "avaliacao": 4.0,
+                    "texto": "Van Damme plays two very different roles and it comes together in a great movie.",
+                    "data": "Oct 23, 2018"
+                },
+                {
+                    "avaliacao": 4.0,
+                    "texto": "Another classic Jean Claude entry.",
+                    "data": "Jun 17, 2018"
+                },
+                {
+                    "avaliacao": 5.0,
+                    "texto": "My 3rd fav Jean-Claude Van Damme film behind Bloodsport & Kickboxer. The tagline to this film is spot on. Michael Rooker's character has to work with a guy who looks practically identical to his own worst enemy, If that's not compelling... I don't know what is. So critics how is this bad? Because this is far more superior to Citizen Kane, The Dark Knight Rises & The Last Jedi combined. Criminally Underrated",
+                    "data": "Mar 25, 2018"
+                },
+                {
+                    "avaliacao": 4.0,
+                    "texto": "Ridiculous premise, but Van Damme is surprisingly convincing in his polar performances, and as always his fight scenes are kinetic and fun.",
+                    "data": "Oct 9, 2016"
+                },
+                {
+                    "avaliacao": 3.0,
+                    "texto": "Okay, so the story has a hokey premise and failed fully explore some potentially thought-provoking themes. Still, I think Van Damme's performance as both the Torch and the Replicant is vastly underappreciated.",
+                    "data": "Oct 6, 2016"
+                },
+                {
+                    "avaliacao": 4.0,
+                    "texto": "One of JCVD's better movies",
+                    "data": "Jan 13, 2016"
+                },
+                {
+                    "avaliacao": 3.5,
+                    "texto": "This movie isn't all that great, but seeing VD fighting himself is always worth your time.",
+                    "data": "May 28, 2015"
+                },
+                {
+                    "avaliacao": 4.0,
+                    "texto": "I see alot of negative reviews and I scratch my head why? Van Damme delivers an exceptional performance with an original plot, you see a new side to his acting in this one! Wish he made more like this! Michael Rooker also surprised me, very aggressive and gritty in this one!",
+                    "data": "Nov 24, 2014"
+                },
+                {
+                    "avaliacao": 2.5,
+                    "texto": "A solid but unspectacular JCVD film that features an intriguing premise and a few fun fight scenes.",
+                    "data": "Jul 3, 2014"
+                },
+                {
+                    "avaliacao": 2.0,
+                    "texto": "Very disappointing, script is awful the fight scenes are just ok. Nothing new and quite pointless. \nVan Damme wasn't too bad though.",
+                    "data": "Mar 1, 2014"
+                },
+                {
+                    "avaliacao": 1.5,
+                    "texto": "*OFFICIAL BETTER THAN EXTREMELY LOUD AND INCREDIBLY CLOSE SEAL*\n\nDumb.",
+                    "data": "Jan 29, 2014"
+                },
+                {
+                    "avaliacao": 2.0,
+                    "texto": "Back in the early 2000 JCVD was trying a come back on the big sceen after years of dud and cocaine tabloids scandals. Here he portrays two different characters, the good & the bad one two twins one created to arrest the first one. It's quite ok as an action flick but it's nothing breathtaking. JCVD is pretty ok as usual too bad the film isn't trying to be more than just an honest B Movie...",
+                    "data": "Jan 14, 2014"
+                },
+                {
+                    "avaliacao": 2.5,
+                    "texto": "1/1/2014: not too bad a movie. Some good action and JCVD did a good job acting.",
+                    "data": "Jan 1, 2014"
+                },
+                {
+                    "avaliacao": 3.0,
+                    "texto": "(54%)\ndecent entry into Van-Damme's strait-to-video movies, with a genuinely good sci-fi premise, as well as decent action sequences that are solidly done, especially given the quite low budget. It may lack a little big budget sheen, but the two leads (Rooker and Van-Damme) give a \"can be bothered\" performance which is something you don't often see in this end of the film industry.",
+                    "data": "Sep 18, 2013"
                 }
             ]
         }

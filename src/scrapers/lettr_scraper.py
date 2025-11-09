@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 import logging
 import requests
+from datetime import datetime
 import re
 import time
 
@@ -16,7 +17,6 @@ class LettrScraper(Scraper):
 
     def __init__(self, periodic_queue, storage: Storage):
         super().__init__(periodic_queue, storage)
-        logging.basicConfig(level=logging.INFO)
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -76,20 +76,17 @@ class LettrScraper(Scraper):
                     logging.info(f"Link adicionado: {link}")
                     self.periodic_queue.put(URL(link, URLType.LTTR))
                     
-
                 movie.set_platforms(self.get_plataforms(page))
 
                 browser.close()
 
-            # logging.info(movie.__str__())
-            # self.storage.store_movie(movie, URLType.LTTR)
+            self.storage.store_movie(movie, URLType.LTTR)
 
     def get_details(self, site):
         details = site.find("div", {"class": "details"})
         title = details.find("span", {"class": "name js-widont prettify"}).text
         directors = details.find_all("a", class_="contributor")
         director_names = [a.text.strip() for a in directors]
-        fim = time.perf_counter()
         return title, director_names
 
     def get_synopsis(self, site):
@@ -111,7 +108,12 @@ class LettrScraper(Scraper):
             country_names_list = [a.text.strip() for a in country_names]
             if "Brazil" in country_names_list:
                 release_date = list_item.find("h5").text
-                return release_date
+                try:
+                    release_date_format = datetime.strptime(release_date, "%d %b %Y").strftime("%Y-%m-%d")
+                    return release_date_format
+                except:
+                    return None
+                
 
     def get_genres(self, site):
         genre_div = site.find("div", class_="text-sluglist capitalize")
@@ -123,38 +125,43 @@ class LettrScraper(Scraper):
         footer_text = site.find("p", {"class": "text-link text-footer"}).text
         footer_parts = footer_text.split()
         lenght = footer_parts[0] + " " + footer_parts[1]
-        return lenght
+        try:
+            lenght = int(footer_parts[0])
+            hour = lenght // 60
+            mins = lenght % 60
+            lenght_format = f"{hour:02d}:{mins:02d}:00"
+            return lenght_format
+        except:
+            return None
     
     # Dinamico
     def get_similar_movies(self, page):
-        inicio = time.perf_counter()
         section = page.locator("ul.poster-list.-p110.-horizontal.-scaled104")
         items = section.locator("li")
         links = []
         for i in range(items.count()):
             link = items.nth(i).locator("div.react-component").get_attribute("data-item-link")
             links.append("https://letterboxd.com" + link)
-        fim = time.perf_counter()
-        logging.info(f"Tempo similar movies: {fim - inicio:.6f} segundos")
         return links
 
     # --> Dinâmico
     def get_ratings_stats(self, page):
-        inicio = time.perf_counter()
         section = page.locator("section.ratings-histogram-chart")
         avg_rating = section.locator("span.average-rating a").get_attribute(
             "data-original-title"
         )
         numbers = re.findall(r"[\d,]+\.\d+|[\d,]+", avg_rating)
-        num_average = float(numbers[0])
         num_ratings = int(numbers[1].replace(",", ""))
-        fim = time.perf_counter()
-        logging.info(f"Tempo ratings: {fim - inicio:.6f} segundos")
-        return num_average, num_ratings
+        num_average = float(numbers[0])
+        try:
+            num_average_format = (num_average * 10)/5
+            num_average_format = f"{num_average_format:.2f}"
+            return num_average_format, num_ratings
+        except:
+            return None, num_ratings
         
     # --> Dinâmico
     def get_plataforms(self, page):
-        inicio = time.perf_counter()
         div = page.locator("section.services.-showall")
         span_locator = div.locator("span.name")
         plataforms = []
@@ -162,12 +169,9 @@ class LettrScraper(Scraper):
             title = span_locator.nth(i).text_content()
             if title:
                 plataforms.append(title)
-        fim = time.perf_counter()
-        logging.info(f"Tempo plataformas: {fim - inicio:.6f} segundos")
         return plataforms
 
     def get_reviews(self, site, movie):
-        inicio_total = time.perf_counter()
         reviews_section = site.find("section", {"class": "film-reviews section js-popular-reviews"})
         if not reviews_section:
             return []
@@ -183,26 +187,22 @@ class LettrScraper(Scraper):
         add_review = movie.add_user_review
 
         for i, review_tag in enumerate(reviews_list, 1):
-            inicio = time.perf_counter()
             span = review_tag.find("span", class_=re.compile(r"^rating"))
             if not span:
                 continue
             s = span.text.strip()
             rating = s.count("★") + 0.5 * s.count("½")
+            rating_format = (rating * 10) / 5
             date = review_tag.time["datetime"]
             review_div = review_tag.select_one("div.body-text.-prose.-reset.js-review-body.js-collapsible-text p")
             if not review_div:
                 continue
             r = Review()
             r.set_date(date)
-            r.set_rating(rating)
+            r.set_rating(rating_format)
             r.set_text(review_div.text)
             add_review(r)
-            logging.info(f"Review {i} -> {time.perf_counter() - inicio:.4f}s")
-
-        logging.info(f"Tempo total reviews: {time.perf_counter() - inicio_total:.4f}s")
-
-
+            
 
 # Lista de infos:
 # url -> Ok
