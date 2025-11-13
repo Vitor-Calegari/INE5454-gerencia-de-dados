@@ -171,7 +171,6 @@ class IMDBScraper(Scraper):
                 date = date_span.get_text(strip=True) if date_span else None
                 datetime = pd.to_datetime(date, format="%b %d, %Y") if date else None
                 data_formatada = (datetime.strftime("%Y-%m-%d")).strip() if datetime else None
-
                 usr_review = Review()
                 usr_review.set_date(data_formatada)
                 usr_review.set_rating(rating)
@@ -305,11 +304,8 @@ class IMDBScraper(Scraper):
         self.scrapUsrReviews(url, movie)
         self.scrapCritReviews(url, movie)
         self.scrapNewMovies(site)
-        print("Done1")
         self.scrapStreamingPlataforms(url, movie)
-        print("Done2")
         self.storage.store_movie(movie, URLType.IMDB)
-        print("Done")
 
 
 # Lista de infos:

@@ -6,6 +6,7 @@ from src.data_structures.review import Review
 import requests
 from bs4 import BeautifulSoup
 from src.storage import Storage
+import json
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -17,60 +18,99 @@ class RottScraper(Scraper):
     
     def __init__(self, periodic_queue, storage: Storage):
         super().__init__(periodic_queue, storage)
+        self.headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/126.0.0.0 Safari/537.36"
+            ),
+            "Accept-Language": "en-US,en;q=0.9",
+        }
     
+    def scrapJSONLD(self, site: BeautifulSoup, movie: Movie):
+        script_tag = site.find("script", type="application/ld+json")
+        if script_tag:
+
+            data = json.loads(script_tag.string)
+            
+            try:
+                title = (data.get("name")).strip()
+                if not title:
+                    return 1
+                movie.set_title(str(title))
+            except Exception:
+                return 1
+            
+            try:
+                directors = [(d["name"]).strip() for d in data.get("director", [])]
+                movie.set_directors(directors)
+            except Exception as e:
+                print("Error: ", e)
+            
+            try:
+                genres = data.get("genre", [])
+                genre_list = [g.strip() for genre in genres for g in genre.split("&")]
+                movie.set_genres(genre_list)
+            except Exception as e:
+                print("Error: ", e)
+
+            try:
+                content_rating = (data.get("contentRating")).strip()
+                movie.set_content_rating(content_rating)
+            except Exception as e:
+                print("Error: ", e)
+
+            return 0
+        else:
+            return 1
+        
     @override
     def scrap(self):
         url = self.periodic_queue.get()
         if (url.get_type() == URLType.END):
             return
         
-        url_str = url.get_url()
-        site = self._get_html(url_str)
-        if not site:
+        response = requests.get(url.get_url(), headers=self.headers)
+        if not response.ok:
+            print(f"Nao foi possivel obter o html de {url}")
+            print(f"Conteudo retornado:")
+            print(response.content)
             return
-
+        
         movie = Movie()
-        movie.set_url(url_str)
+        movie.set_url(url=url.get_url())
+        site = BeautifulSoup(response.content, "html.parser")
 
+        if self.scrapJSONLD(site, movie) == 1:
+            return
         # extração principal
-        movie.set_title(self._get_title(site))
-        movie.set_genres(self._get_genres(site))
-        movie.set_release_date(self._get_release_date(site, "Release Date (Theaters)"))
-        content_rating, length = self._get_metadata(site)
-        movie.set_content_rating(content_rating)
-        movie.set_length(length)
-        movie.set_synopsis(self._get_synopsis(site))
-        movie.set_directors(self._get_directors(site))
-        movie.set_cast(self._get_cast(url_str))
-        crit_score, usr_score = self._get_scores(site)
-        movie.set_crit_avr_rating(crit_score)
-        movie.set_usr_avr_rating(usr_score)
-        movie.set_usr_reviews(self._get_user_reviews(url_str))
-        movie.set_crit_reviews(self._get_critic_reviews(url_str))
+        # movie.set_title(self._get_title(site))
+        # movie.set_genres(self._get_genres(site))
+        # movie.set_release_date(self._get_release_date(site, "Release Date (Theaters)"))
+        # content_rating, length = self._get_metadata(site)
+        # movie.set_content_rating(content_rating)
+        # movie.set_length(length)
+        # movie.set_synopsis(self._get_synopsis(site))
+        # movie.set_directors(self._get_directors(site))
+        # movie.set_cast(self._get_cast(url_str))
+        # crit_score, usr_score = self._get_scores(site)
+        # movie.set_crit_avr_rating(crit_score)
+        # movie.set_usr_avr_rating(usr_score)
+        # movie.set_usr_reviews(self._get_user_reviews(url_str))
+        # movie.set_crit_reviews(self._get_critic_reviews(url_str))
 
-        more_like_this = site.find("section", {"data-qa": "section:more-like-this"})
-        if more_like_this:
-            # Dentro dela, procura todos os <rt-link> que tenham o slot "primaryImage"
-            for link_tag in more_like_this.select('rt-link[slot="primaryImage"]'):
-                href = link_tag.get("href")
-                if href and href.startswith("/m/"):  # garante que é link de filme
-                    self.periodic_queue.put(URL("https://www.rottentomatoes.com" + href, URLType.ROTT))
+        # more_like_this = site.find("section", {"data-qa": "section:more-like-this"})
+        # if more_like_this:
+        #     # Dentro dela, procura todos os <rt-link> que tenham o slot "primaryImage"
+        #     for link_tag in more_like_this.select('rt-link[slot="primaryImage"]'):
+        #         href = link_tag.get("href")
+        #         if href and href.startswith("/m/"):  # garante que é link de filme
+        #             self.periodic_queue.put(URL("https://www.rottentomatoes.com" + href, URLType.ROTT))
                     
-        self.storage.store_movie(movie, URLType.ROTT)
+        # self.storage.store_movie(movie, URLType.ROTT)
         return movie
 
     # ---------------------- FUNÇÕES AUXILIARES ----------------------
-
-    def _get_html(self, url: str) -> BeautifulSoup | None:
-        try:
-            response = requests.get(url, headers=headers)
-            if not response.ok:
-                print(f"Não foi possível obter o HTML de {url}")
-                return None
-            return BeautifulSoup(response.content, "html.parser")
-        except Exception as e:
-            print(f"Erro ao acessar {url}: {e}")
-            return None
 
     def _get_title(self, site: BeautifulSoup) -> str:
         tag = site.find("rt-text", {"slot": "title", "context": "heading"})
