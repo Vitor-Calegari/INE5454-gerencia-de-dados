@@ -53,7 +53,7 @@ class LettrScraper(Scraper):
 
             section = site.find("div", {"id": "tabbed-content"})
             movie.set_cast(self.get_cast(section))
-            movie.set_release_date_theater(self.get_release_date(section))
+            movie.set_release_date(self.get_release_date(section))
             movie.set_genres(self.get_genres(section))
 
             movie.set_length(self.get_length(site))
@@ -208,7 +208,7 @@ class LettrScraper(Scraper):
 # url -> Ok
 # title -> Ok
 # genres -> Ok
-# release_date_theater -> Ok --> Peguei do Brasil, mas atrasa a execução
+# release_date -> Ok --> Peguei do Brasil, mas atrasa a execução
 # release_date_streaming -> Não tem no Letterbox
 # synopsis -> Ok
 # length -> Ok (em minutos)

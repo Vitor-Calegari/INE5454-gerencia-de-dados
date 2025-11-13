@@ -35,8 +35,7 @@ class RottScraper(Scraper):
         # extração principal
         movie.set_title(self._get_title(site))
         movie.set_genres(self._get_genres(site))
-        movie.set_release_date_theater(self._get_release_date(site, "Release Date (Theaters)"))
-        movie.set_release_date_streaming(self._get_release_date(site, "Release Date (Streaming)"))
+        movie.set_release_date(self._get_release_date(site, "Release Date (Theaters)"))
         content_rating, length = self._get_metadata(site)
         movie.set_content_rating(content_rating)
         movie.set_length(length)

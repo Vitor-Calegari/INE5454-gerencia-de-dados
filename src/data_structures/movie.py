@@ -9,8 +9,7 @@ class Movie:
         self.url = []
         self.title = None
         self.genres = []
-        self.release_date_theater = None
-        self.release_date_streaming = None
+        self.release_date = None
         self.synopsis = None
         self.length = None
         self.directors = []
@@ -18,9 +17,11 @@ class Movie:
         self.platforms = []
         self.content_rating = None
         self.crit_avr_rating = None
+        self.crit_avr_recommendation = None
         self.crit_reviews = []
         self.crit_rev_count = None
         self.usr_avr_rating = None
+        self.usr_avr_recommendation = None
         self.usr_reviews = []
         self.usr_rev_count = None
     
@@ -54,11 +55,9 @@ class Movie:
             movie.add_genre(genre)
 
         format = "%Y-%m-%d"  # TODO definir formato correto
-        release_date_s = pd.to_datetime([self.get_release_date_streaming(), other.get_release_date_streaming()], format=format, errors="coerce")
-        movie.set_release_date_streaming(release_date_s.min())
         
-        release_date_t = pd.to_datetime([self.get_release_date_theater(), other.get_release_date_theater()], format=format, errors="coerce")
-        movie.set_release_date_theater(release_date_t.min())
+        release_date_t = pd.to_datetime([self.get_release_date(), other.get_release_date()], format=format, errors="coerce")
+        movie.set_release_date(release_date_t.min())
         
         if len(self.get_synopsis()) >= len(other.get_synopsis()):
             movie.set_synopsis(self.get_synopsis())
@@ -98,7 +97,7 @@ class Movie:
         return movie
        
     # Getters -----------------------
-    def get_title(self) -> str:
+    def get_title(self) -> str | None:
         return self.title
 
     def get_url(self) -> list[str]:
@@ -107,16 +106,14 @@ class Movie:
     def get_genres(self) -> list:
         return self.genres
     
-    def get_release_date_theater(self) -> str:
-        return self.release_date_theater
+    def get_release_date(self) -> str | None:
+        return self.release_date
     
-    def get_release_date_streaming(self) -> str:
-        return self.release_date_streaming
-    
-    def get_synopsis(self) -> str:
+
+    def get_synopsis(self) -> str | None:
         return self.synopsis
     
-    def get_length(self) -> str:
+    def get_length(self) -> str | None:
         return self.length
     
     def get_directors(self) -> list:
@@ -128,29 +125,35 @@ class Movie:
     def get_platforms(self) -> list:
         return self.platforms
     
-    def get_content_rating(self) -> str:
+    def get_content_rating(self) -> str | None:
         return self.content_rating
     
-    def get_crit_avr_rating(self) -> float:
+    def get_crit_avr_rating(self) -> float | None:
         return self.crit_avr_rating
     
+    def get_crit_avr_recommendation(self) -> int | None:
+        return self.crit_avr_recommendation
+
     def get_crit_reviews(self) -> list:
         return self.crit_reviews
     
-    def get_crit_reviews_count(self) -> int:
+    def get_crit_reviews_count(self) -> int | None:
         return self.crit_rev_count
     
-    def get_usr_avr_rating(self) -> float:
+    def get_usr_avr_rating(self) -> float | None:
         return self.usr_avr_rating
+    
+    def get_usr_avr_recommendation(self) -> int | None:
+        return self.usr_avr_recommendation
     
     def get_usr_reviews(self) -> list:
         return self.usr_reviews
     
-    def get_usr_reviews_count(self) -> int:
+    def get_usr_reviews_count(self) -> int | None:
         return self.usr_rev_count
     
     # Setters -----------------------
-    def set_title(self, title: str) -> None:
+    def set_title(self, title: str | None) -> None:
         self.title = title
 
     def set_url(self, url: list[str]) -> None:
@@ -159,11 +162,8 @@ class Movie:
     def set_genres(self, genres: list) -> None:
         self.genres = genres
     
-    def set_release_date_theater(self, release_date_theater: str) -> None:
-        self.release_date_theater = release_date_theater
-    
-    def set_release_date_streaming(self, release_date_streaming: str) -> None:
-        self.release_date_streaming = release_date_streaming
+    def set_release_date(self, release_date: str) -> None:
+        self.release_date = release_date
     
     def set_synopsis(self, synopsis: str) -> None:
         self.synopsis = synopsis
@@ -192,6 +192,9 @@ class Movie:
     def set_crit_rev_count(self, reviews_count: int) -> None:
         self.crit_rev_count = reviews_count
     
+    def set_crit_avr_recommendation(self, recommendation) -> int | None:
+        self.crit_avr_recommendation = recommendation
+    
     def set_usr_avr_rating(self, rating: float) -> None:
         self.usr_avr_rating = rating
     
@@ -200,6 +203,9 @@ class Movie:
     
     def set_usr_rev_count(self, reviews_count: int) -> None:
         self.usr_rev_count = reviews_count
+    
+    def set_usr_avr_recommendation(self, recommendation) -> int | None:
+        self.usr_avr_recommendation = recommendation
 
     # List insertion methods
     def add_url(self, url: str) -> None:
@@ -228,8 +234,7 @@ class Movie:
         return (f"{self.title}:\n"
                 f"-URL: {self.url}\n"
                 f"-Genres: {', '.join(self.genres)}\n"
-                f"-Release Date (Theater): {self.release_date_theater}\n"
-                f"-Release Date (Streaming): {self.release_date_streaming}\n"
+                f"-Release Date (Theater): {self.release_date}\n"
                 f"-Synopsis: {self.synopsis}\n"
                 f"-Length: {self.length}\n"
                 f"-Directors: {', '.join(self.directors)}\n"
@@ -238,5 +243,7 @@ class Movie:
                 f"-Content Rating: {self.content_rating}\n"
                 f"-Critics Average Rating: {self.crit_avr_rating}\n"
                 f"-Critics Rating count: {self.crit_rev_count}\n"
+                f"-Critics Average Recommendation Percentage: {self.crit_avr_recommendation}\n"
                 f"-User Average Rating: {self.usr_avr_rating}\n"
-                f"-User Rating count: {self.usr_rev_count}")
+                f"-User Rating count: {self.usr_rev_count}\n"
+                f"-User Average Recommendation Percentage: {self.usr_avr_recommendation}")
