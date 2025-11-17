@@ -7,6 +7,12 @@ import requests
 from bs4 import BeautifulSoup
 from src.storage import Storage
 import json
+import pandas as pd
+import re
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+import time
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -63,14 +69,304 @@ class RottScraper(Scraper):
             return 0
         else:
             return 1
+    
+    def scrapMovieInfo(self, site: BeautifulSoup, movie: Movie):
+        section = site.find("section", {"class": "media-info"})
+        if section:
+            try:
+                synopsis_tag = section.find("rt-text", {"data-qa": "synopsis-value"})
+                synopsis = synopsis_tag.get_text(strip=True)
+                movie.set_synopsis(synopsis)
+            except Exception as e:
+                print("Error: ", e)
+            
+            dates = []
+            wraps = section.find_all("div", {"class": "category-wrap", "data-qa": "item"})
+            for wrap in wraps:
+                try:
+                    label_tag = wrap.find("rt-text", {"data-qa": "item-label"})
+                    if label_tag and "release date" in label_tag.text.strip().lower():
+                        try:
+                            val = wrap.find(attrs={"data-qa": "item-value"})
+                            if val:
+                                raw = val.text.strip()
+                                # remover coisas extras tipo ", Wide"
+                                parts = raw.split(", ")
+                                if len(parts) > 2:
+                                    cleaned = f"{parts[0]}, {parts[1]}"
+                                else:
+                                    cleaned = raw
+
+                                dt = pd.to_datetime(cleaned).strftime("%Y-%m-%d").strip()
+                                dates.append(dt)
+                        except Exception as e:
+                            print("Error: ", e)
+
+                    elif label_tag and label_tag.text.strip().lower() == "runtime":
+                        try:
+                            val = wrap.find(attrs={"data-qa": "item-value"})
+                            if val:
+                                length = val.text.strip()
+                                pd_length = pd.to_timedelta(length)
+                                length_formatted = str(pd_length).split()[-1]
+                                movie.set_length(length_formatted)
+                        except Exception as e:
+                            print("Error: ", e)
+                except Exception as e:
+                    print("Error: ", e)
+
+            if dates:
+                oldest_date = min(dates)
+                movie.set_release_date(oldest_date)
+     
+
+    def scrapCast(self, movie: Movie, url: str):
+        url_cast = f"{url}/cast-and-crew"
+
+        response = requests.get(url_cast, headers=headers)
+        if not response.ok:
+            print(f"Nao foi possivel obter o html de {url_cast}")
+            print(f"Conteudo retornado:")
+            print(response.content)
+            return
         
+        try:
+            cast_site = BeautifulSoup(response.content, "html.parser")
+            script_tag = cast_site.find("script", type="application/ld+json")
+            if script_tag:
+
+                raw_json = script_tag.string.strip()
+                data = json.loads(raw_json)
+                actor_data = data.get("actor")
+                for person in actor_data:
+                    try:
+                        name = person.get("name").strip()
+                        if name:
+                            movie.add_cast_member(name)
+                    except Exception as e:
+                        print("Error: ", e)
+        except Exception as e:
+            print("Error: ", e)
+
+    def scrapRevData(self, site: BeautifulSoup, movie: Movie):
+        script_tag = site.find("script", id="media-scorecard-json")
+
+        try:
+            if script_tag:
+                raw_json = script_tag.text.strip()
+                data = json.loads(raw_json)
+                
+                if data:
+                    aud = data["audienceScore"]
+                    crit = data["criticsScore"]
+
+                    if aud:
+                        try:
+                            aud_review_count = int(aud["reviewCount"])
+                            movie.set_usr_rev_count(aud_review_count)
+                        except Exception as e:
+                            print("Error: ", e)
+
+                        try:
+                            aud_score_percent = int(aud["scorePercent"].replace("%", ""))
+                            movie.set_usr_avr_recommendation(aud_score_percent)
+                        except Exception as e:
+                            print("Error: ", e)
+
+                        try:
+                            aud_avg_rating = float(aud["averageRating"])*2   # *2 pra transformar nota até 5 em até 10
+                            movie.set_usr_avr_rating(aud_avg_rating)
+                        except Exception as e:
+                            print("Error: ", e)
+                    
+                    if crit:
+                        try:
+                            crit_review_count = int(crit["reviewCount"])
+                            movie.set_crit_rev_count(crit_review_count)
+                        except Exception as e:
+                            print("Error: ", e)
+                        
+                        try:
+                            crit_score_percent = int(crit["scorePercent"].replace("%", ""))
+                            movie.set_crit_avr_recommendation(crit_score_percent)
+                        except Exception as e:
+                            print("Error: ", e)
+
+                        try:
+                            crit_avg_rating = float(crit["averageRating"])
+                            movie.set_crit_avr_rating(crit_avg_rating)
+                        except Exception as e:
+                            print("Error: ", e)
+
+        except Exception as e:
+            print("Error: ", e)
+
+    def scrapUsrReviews(self, movie: Movie, url: str):
+        url_rev = f"{url}/reviews?type=user"
+
+        response = requests.get(url_rev, headers=headers)
+        if not response.ok:
+            print(f"Nao foi possivel obter o html de {url_rev}")
+            print(f"Conteudo retornado:")
+            print(response.content)
+            return
+        
+        try:
+            rev_site = BeautifulSoup(response.content, "html.parser")
+
+            for review_div in rev_site.find_all("div", class_="audience-review-row"):
+                try:
+                    texto_tag = review_div.find("p", {"data-qa": "review-text"})
+                    texto = texto_tag.get_text(strip=True) if texto_tag else None
+
+                    score_tag = review_div.find("rating-stars-group")
+                    nota = float(score_tag["score"])*2 if score_tag and score_tag.has_attr("score") else None
+
+                    data_tag = review_div.find("span", {"data-qa": "review-duration"})
+                    date = data_tag.get_text(strip=True) if data_tag else None
+                    if date:
+                        date_formatted = pd.to_datetime(date).strftime("%Y-%m-%d").strip()
+
+                    review = Review()
+                    review.set_text(texto)
+                    review.set_rating(nota)
+                    review.set_date(date_formatted)
+                    movie.add_user_review(review)
+                except Exception as e:
+                    print("Error: ", e)
+
+        except Exception as e:
+            print("Error: ", e)
+
+    def scrapCritReviews(self, movie: Movie, url: str):
+        url_rev = f"{url}/reviews"
+
+        response = requests.get(url_rev, headers=headers)
+        if not response.ok:
+            print(f"Nao foi possivel obter o html de {url_rev}")
+            print(f"Conteudo retornado:")
+            print(response.content)
+            return
+        
+        try:
+            rev_site = BeautifulSoup(response.content, "html.parser")
+
+            for review_div in rev_site.find_all("div", class_="review-row"):
+                try:
+                    nota = None
+                    score_tag = review_div.find("p", class_="original-score-and-url")
+                    if score_tag:
+                        parts = score_tag.get_text(strip=True).split("Original Score:")
+                        if len(parts) > 1:
+                            raw = parts[1].split("|")[0].strip()
+                            raw = raw.strip().upper()
+
+                            # 1) IGNORAR notas em letra
+                            if re.match(r"^[A-F][+-]?$", raw):
+                                pass
+
+                            # 2) Frações (3/4, 9/10 etc.)
+                            elif "/" in raw and re.match(r"^\d+(\.\d+)?/\d+(\.\d+)?$", raw):
+                                num, den = raw.split("/")
+                                num = float(num)
+                                den = float(den)
+                                if den == 0:
+                                    pass
+                                nota = round((num / den) * 10, 2)
+
+                            # 3) Número direto (0–10)
+                            elif re.match(r"^\d+(\.\d+)?$", raw):
+                                value = float(raw)
+                                if value <= 10:
+                                    nota = value
+                                # caso improvável (nota tipo 80/100 sem barra)
+                                nota = round((value / 100) * 10, 2)
+
+                    data_tag = review_div.find("span", {"data-qa": "review-date"})
+                    date = data_tag.get_text(strip=True) if data_tag else None
+                    if date:
+                        date_formatted = pd.to_datetime(date).strftime("%Y-%m-%d").strip()
+                            
+                    texto_tag = review_div.find("p", {"data-qa": "review-quote", "class": "review-text"})
+                    texto = texto_tag.get_text(strip=True) if texto_tag else None
+                    
+                    review = Review()
+                    review.set_text(texto)
+                    review.set_rating(nota)
+                    review.set_date(date_formatted)
+                    movie.add_critic_review(review)
+
+                except Exception as e:
+                    print("Error: ", e)
+        except Exception as e:
+            print("Error: ", e)
+
+    def scrapNewMovies(self, site: BeautifulSoup):
+        try:
+            more_like_this = site.find("section", {"data-qa": "section:more-like-this"})
+            if more_like_this:
+                # Dentro dela, procura todos os <rt-link> que tenham o slot "primaryImage"
+                for link_tag in more_like_this.select('rt-link[slot="primaryImage"]'):
+                    href = link_tag.get("href")
+                    if href and href.startswith("/m/"):  # garante que é link de filme
+                        self.periodic_queue.put(URL("https://www.rottentomatoes.com" + href.strip(), URLType.ROTT))
+        except Exception as e:
+            print("Error: ", e)
+
+    def scrapDynamicData(self, url: URL, movie: Movie):
+        options = Options()
+        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/120.0.0.0 Safari/537.36")
+        options.add_argument("--headless")  # roda sem abrir janela
+        driver = webdriver.Chrome(options=options)
+
+        driver.get(url.get_url())  # The Matrix
+        time.sleep(3)  # espera carregar o widget
+
+        # Encontra o iframe correto dentro da div data-wheretowatchmanager="jwContainer"
+        iframe = driver.find_element(
+            By.XPATH,
+            "//div[@data-wheretowatchmanager='jwContainer']//iframe[contains(@class, 'jw-widget-iframe')]"
+        )
+
+        # muda o contexto para dentro do iframe
+        driver.switch_to.frame(iframe)
+
+        time.sleep(2)  # espera o conteúdo dinâmico carregar
+
+        # Encontra todos os blocos de ofertas (plataformas)
+        offers = driver.find_elements(
+            By.XPATH,
+            "//div[contains(@class,'jw-offer')]/a"
+        )
+
+        platforms = []
+        for offer in offers:
+            link = offer.get_attribute("href")
+            try:
+                img = offer.find_element(By.TAG_NAME, "img")
+                platform_name = img.get_attribute("alt") or img.get_attribute("title")
+            except:
+                platform_name = "Unknown"
+            platforms.append((platform_name, link))
+
+        # exibe resultado
+        for name, link in platforms:
+            print(f"{name}: {link}")
+
+        # sai do iframe e encerra
+        driver.switch_to.default_content()
+        driver.quit()
+
     @override
     def scrap(self):
         url = self.periodic_queue.get()
         if (url.get_type() == URLType.END):
             return
         
-        response = requests.get(url.get_url(), headers=self.headers)
+        url_str = url.get_url()
+        response = requests.get(url_str, headers=self.headers)
         if not response.ok:
             print(f"Nao foi possivel obter o html de {url}")
             print(f"Conteudo retornado:")
@@ -78,155 +374,18 @@ class RottScraper(Scraper):
             return
         
         movie = Movie()
-        movie.set_url(url=url.get_url())
+        movie.set_url(url=url_str)
         site = BeautifulSoup(response.content, "html.parser")
 
         if self.scrapJSONLD(site, movie) == 1:
             return
-        # extração principal
-        # movie.set_title(self._get_title(site))
-        # movie.set_genres(self._get_genres(site))
-        # movie.set_release_date(self._get_release_date(site, "Release Date (Theaters)"))
-        # content_rating, length = self._get_metadata(site)
-        # movie.set_content_rating(content_rating)
-        # movie.set_length(length)
-        # movie.set_synopsis(self._get_synopsis(site))
-        # movie.set_directors(self._get_directors(site))
-        # movie.set_cast(self._get_cast(url_str))
-        # crit_score, usr_score = self._get_scores(site)
-        # movie.set_crit_avr_rating(crit_score)
-        # movie.set_usr_avr_rating(usr_score)
-        # movie.set_usr_reviews(self._get_user_reviews(url_str))
-        # movie.set_crit_reviews(self._get_critic_reviews(url_str))
-
-        # more_like_this = site.find("section", {"data-qa": "section:more-like-this"})
-        # if more_like_this:
-        #     # Dentro dela, procura todos os <rt-link> que tenham o slot "primaryImage"
-        #     for link_tag in more_like_this.select('rt-link[slot="primaryImage"]'):
-        #         href = link_tag.get("href")
-        #         if href and href.startswith("/m/"):  # garante que é link de filme
-        #             self.periodic_queue.put(URL("https://www.rottentomatoes.com" + href, URLType.ROTT))
+        
+        self.scrapMovieInfo(site, movie)
+        self.scrapCast(movie, url_str)
+        self.scrapRevData(site, movie)
+        self.scrapUsrReviews(movie, url_str)
+        self.scrapCritReviews(movie, url_str)
+        # self.scrapDynamicData(url, movie)
+        self.scrapNewMovies(site)
                     
-        # self.storage.store_movie(movie, URLType.ROTT)
-        return movie
-
-    # ---------------------- FUNÇÕES AUXILIARES ----------------------
-
-    def _get_title(self, site: BeautifulSoup) -> str:
-        tag = site.find("rt-text", {"slot": "title", "context": "heading"})
-        return tag.text.strip() if tag else ""
-
-    def _get_genres(self, site: BeautifulSoup) -> list[str]:
-        tags = site.find_all("rt-text", {"slot": "metadataGenre"})
-        return [t.text.strip() for t in tags]
-
-    def _get_release_date(self, site: BeautifulSoup, label: str) -> str:
-        wraps = site.find_all("div", {"class": "category-wrap", "data-qa": "item"})
-        for wrap in wraps:
-            lbl = wrap.find("rt-text", {"data-qa": "item-label"})
-            if lbl and lbl.text.strip() == label:
-                val = wrap.find("rt-text", {"data-qa": "item-value"})
-                return val.text.strip() if val else ""
-        return ""
-
-    def _get_metadata(self, site: BeautifulSoup) -> str:
-        metadata = site.find_all("rt-text", {"slot": "metadataProp", "context": "label"})
-        content_rating = metadata[0].text.strip() if metadata[0] else ""
-        length = ""
-        if len(metadata) >= 3:
-            length = metadata[2].text.strip()
-        return content_rating, length
-
-    def _get_synopsis(self, site: BeautifulSoup) -> str:
-        tag = site.find("rt-text", {"data-qa": "synopsis-value"})
-        return tag.text.strip() if tag else ""
-
-    def _get_directors(self, site: BeautifulSoup) -> list[str]:
-        directors = []
-        wraps = site.find_all("div", {"class": "category-wrap", "data-qa": "item"})
-        for wrap in wraps:
-            label_tag = wrap.find("rt-text", {"data-qa": "item-label"})
-            if label_tag and label_tag.text.strip() == "Director":
-                director_tags = wrap.find_all("rt-link", {"data-qa": "item-value"})
-                directors.extend([t.text.strip() for t in director_tags])
-        return directors
-
-    def _get_cast(self, url: str) -> list[str]:
-        url_cast = f"{url}/cast-and-crew"
-        site = self._get_html(url_cast)
-        if not site:
-            return []
-        cast = []
-        cards = site.find_all("cast-and-crew-card", {"data-role": "all,cast"})
-        for card in cards:
-            credit_tag = card.find("rt-text", {"slot": "credits"})
-            if credit_tag and credit_tag.text.strip() == "Actor":
-                name_tag = card.find("rt-text", {"slot": "title"})
-                if name_tag:
-                    cast.append(name_tag.text.strip())
-        return cast
-
-    def _get_scores(self, site: BeautifulSoup) -> tuple[float, float]:
-        scorecard = site.find("div", {"class": "media-scorecard"})
-        crit, usr = "", ""
-        if scorecard:
-            crit_tag = scorecard.find("rt-text", {"slot": "criticsScore", "context": "label"})
-            usr_tag = scorecard.find("rt-text", {"slot": "audienceScore", "context": "label"})
-            crit = crit_tag.text.strip() if crit_tag else ""
-            usr = usr_tag.text.strip() if usr_tag else ""
-        return crit, usr
-
-
-    def _get_user_reviews(self, url: str) -> list[Review]:
-        url_usr = f"{url}/reviews?type=user"
-        site = self._get_html(url_usr)
-        if not site:
-            return []
-
-        reviews = []
-        for review_div in site.find_all("div", class_="audience-review-row"):
-            texto_tag = review_div.find("p", {"data-qa": "review-text"})
-            texto = texto_tag.get_text(strip=True) if texto_tag else ""
-
-            score_tag = review_div.find("rating-stars-group")
-            nota = float(score_tag["score"]) if score_tag and score_tag.has_attr("score") else ""
-
-            data_tag = review_div.find("span", {"data-qa": "review-duration"})
-            data = data_tag.get_text(strip=True) if data_tag else ""
-
-            review = Review()
-            review.set_text(texto)
-            review.set_rating(nota)
-            review.set_date(data)
-            reviews.append(review)
-        return reviews
-
-    def _get_critic_reviews(self, url: str) -> list[Review]:
-        url_rev = f"{url}/reviews"
-        site = self._get_html(url_rev)
-        if not site:
-            return []
-
-        reviews = []
-        for review_div in site.find_all("div", class_="review-row"):
-            # nota
-            nota = ""
-            score_tag = review_div.find("p", class_="original-score-and-url")
-            if score_tag:
-                parts = score_tag.get_text(strip=True).split("Original Score:")
-                if len(parts) > 1:
-                    nota = parts[1].split("|")[0].strip()
-
-            data_tag = review_div.find("span", {"data-qa": "review-date"})
-            data = data_tag.get_text(strip=True) if data_tag else ""
-
-            texto_tag = review_div.find("p", {"data-qa": "review-quote", "class": "review-text"})
-            texto = texto_tag.get_text(strip=True) if texto_tag else ""
-
-            review = Review()
-            review.set_text(texto)
-            review.set_rating(nota)
-            review.set_date(data)
-            reviews.append(review)
-        return reviews
-
+        self.storage.store_movie(movie, URLType.ROTT)
