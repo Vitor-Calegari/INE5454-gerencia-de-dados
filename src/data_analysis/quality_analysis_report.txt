@@ -1,0 +1,56 @@
+==================================================
+ANÁLISE DE QUALIDADE DOS DADOS
+==================================================
+
+3.1 VALORES INCONSISTENTES
+--------------------------------------------------
+duracao_invalida: 0 (0.00%)
+media_crit_fora_range: 0 (0.00%)
+media_usr_fora_range: 0 (0.00%)
+data_futura: 0 (0.00%)
+data_muito_antiga: 0 (0.00%)
+
+3.2 OUTLIERS
+--------------------------------------------------
+
+duracao:
+  Total de valores: 12
+  Outliers detectados: 3 (25.00%)
+  Limite inferior: 99.62
+  Limite superior: 158.62
+
+media_usr:
+  Total de valores: 3
+  Outliers detectados: 0 (0.00%)
+  Limite inferior: 3.85
+  Limite superior: 9.82
+
+3.3 DADOS FALTANTES
+--------------------------------------------------
+titulo: 0 faltantes (0.00%)
+duracao: 0 faltantes (0.00%)
+generos: 0 faltantes (0.00%)
+data de lançamento nos cinemas: 0 faltantes (0.00%)
+media_usr: 0 faltantes (0.00%)
+cast: 0 faltantes (0.00%)
+classificacao: 12 faltantes (100.00%)
+
+3.4 DUPLICATAS
+--------------------------------------------------
+Total de títulos únicos: 7
+Títulos duplicados: 3
+
+Títulos com duplicatas:
+  'The Matrix': 4 ocorrências
+  'The Matrix Reloaded': 2 ocorrências
+  'District B13': 2 ocorrências
+
+Registros completamente idênticos: 2
+
+==================================================
+RESUMO DE QUALIDADE
+==================================================
+Score de Completude: 85.71%
+Score de Consistência: 100.00%
+Score de Unicidade: 57.14%
+Score Geral de Qualidade: 80.95%
