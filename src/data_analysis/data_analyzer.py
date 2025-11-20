@@ -64,11 +64,11 @@ class DataAnalyzer:
             )
 
         plt.xticks(x + width * len(sources) / 2, fields, rotation=45, ha="right")
-        plt.ylabel("Filmes")
+        plt.ylabel("Contagem de Filmes")
         plt.title("Disponibilidade de Campos")
         plt.legend(title="Fontes")
         plt.tight_layout()
-        plt.savefig("disponibilidade_por_fonte.png", dpi=300, bbox_inches="tight")
+        plt.savefig("graphs/disponibilidade_por_fonte.png", dpi=300, bbox_inches="tight")
 
         field_types = defaultdict(list)
 
