@@ -21,3 +21,11 @@ class URL:
     
     def __str__(self):
         return f"URLType: {self.url_str}, {self.type}"
+    
+    def __eq__(self, other):
+        if not isinstance(other, URL):
+            return NotImplemented
+        return self.url_str == other.url_str
+
+    def __hash__(self):
+        return hash(self.url_str)
