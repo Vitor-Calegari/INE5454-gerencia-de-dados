@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-stylesheet href="https://moise-lang.github.io/xml/os.xsl" type="text/xsl" ?>
+
+<organisational-specification
+    id="new_app"
+    os-version="0.8"
+
+    xmlns='http://moise.sourceforge.net/os'
+    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:schemaLocation='http://moise.sourceforge.net/os
+                        https://moise-lang.github.io/xml/os.xsd' >
+
+
+    <structural-specification>
+        <role-definitions>
+            <role id="coord" />
+            <role id="worker" />
+        </role-definitions>
+
+
+        <group-specification id="squareGroup">
+            <roles>
+                <role id="coord" min="1" max="1" />
+                <role id="worker" min="1" max="100" /> 
+            </roles>
+            <links>
+                <link from="coord" type="communication"  to="worker" scope="intra-group" />
+                <link from="worker" type="communication" to="coord" scope="intra-group" />
+            </links>
+        </group-specification>
+    </structural-specification>
+
+
+    <functional-specification>
+        <scheme id="calcScheme">
+            <goal id="calculate">
+                <plan operator="sequence">
+                    <goal id="init" />
+                    <goal id="square">
+                        <argument id="N" />
+                    </goal>
+                </plan>
+            </goal>
+
+
+            <mission id="mCoord" min="1" max="1">
+                <goal id="calculate" />
+                <goal id="init" />
+            </mission>
+            <mission id="mWorker" min="1" max="100">
+                <goal id="square" />
+            </mission>
+        </scheme>
+    </functional-specification>
+
+
+    <normative-specification>
+        <norm id="nCoord" type="obligation" role="coord" mission="mCoord" time-constraint="20 seconds"/>
+        <norm id="nWorker" type="obligation" role="worker" mission="mWorker" time-constraint="10 seconds"/>
+    </normative-specification>
+
+
+</organisational-specification>
