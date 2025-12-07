@@ -22,10 +22,11 @@ class LettrScraper(Scraper):
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/126.0.0.0 Safari/537.36"
         }
+        self.name = "Letterboxd"
 
     @override
     def scrap(self):
-        url = self.periodic_queue.get()
+        url = self.periodic_queue.get(timeout=5)
 
         if url.get_type() == URLType.END:
             return

@@ -32,6 +32,7 @@ class RottScraper(Scraper):
             ),
             "Accept-Language": "en-US,en;q=0.9",
         }
+        self.name = "Rotten Tomatoes"
     
     def scrapJSONLD(self, site: BeautifulSoup, movie: Movie):
         script_tag = site.find("script", type="application/ld+json")
@@ -119,7 +120,6 @@ class RottScraper(Scraper):
                 oldest_date = min(dates)
                 movie.set_release_date(oldest_date)
      
-
     def scrapCast(self, movie: Movie, url: str):
         url_cast = f"{url}/cast-and-crew"
 
@@ -361,7 +361,8 @@ class RottScraper(Scraper):
 
     @override
     def scrap(self):
-        url = self.periodic_queue.get()
+        url = self.periodic_queue.get(timeout=5)
+
         if (url.get_type() == URLType.END):
             return
         

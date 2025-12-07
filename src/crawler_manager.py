@@ -64,5 +64,9 @@ class CrawlerManager(Observer):
         imdb_thread.join()
         lettr_thread.join()
         rott_thread.join()
-
+        
+        imdb_scraper.print_metrics()
+        lettr_scraper.print_metrics()
+        rott_scraper.print_metrics()
+        
         self.storage.dump_to_json()

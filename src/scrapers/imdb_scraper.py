@@ -32,6 +32,7 @@ class IMDBScraper(Scraper):
             ),
             "Accept-Language": "en-US,en;q=0.9",
         }
+        self.name = "IMDB"
 
 
     def scrapJSONLD(self, site: BeautifulSoup, movie: Movie):
@@ -62,16 +63,19 @@ class IMDBScraper(Scraper):
             try:
                 movie.set_genres([g.strip() for g in data.get("genre", [])])
             except Exception as e:
+                self._errors += 1
                 print("Error: ", e)
 
             try:
                 movie.set_release_date(data.get("datePublished").strip())
             except Exception as e:
+                self._errors += 1
                 print("Error: ", e)
 
             try:
                 movie.set_synopsis((data.get("description")).strip())
             except Exception as e:
+                self._errors += 1
                 print("Error: ", e)
 
             try:
@@ -81,12 +85,14 @@ class IMDBScraper(Scraper):
                         formatted = str(pd_duration).split()[-1]
                         movie.set_length(formatted.strip())
             except Exception as e:
+                self._errors += 1
                 print("Error: ", e)
 
             # Extracting content rating
             try:
                 movie.set_content_rating((data.get("contentRating")).strip())
             except Exception as e:
+                self._errors += 1
                 print("Error: ", e)
 
             # Extracting user ratings
@@ -95,12 +101,14 @@ class IMDBScraper(Scraper):
                 ratingValue = aggregate_rating.get("ratingValue")
                 movie.set_usr_avr_rating(float(ratingValue))
             except Exception as e:
+                self._errors += 1
                 print("Error: ", e)
 
             try:
                 ratingCount = aggregate_rating.get("ratingCount")
                 movie.set_usr_rev_count(int(ratingCount))
             except Exception as e:
+                self._errors += 1
                 print("Error: ", e)
             
             return 0
@@ -122,6 +130,7 @@ class IMDBScraper(Scraper):
                     for director in container.find_all("a"):
                         movie.add_director(director.text.strip())
         except Exception as e:
+            self._errors += 1
             print("Error: ", e)
 
     def scrapCast(self, site: BeautifulSoup, movie: Movie):
@@ -132,6 +141,7 @@ class IMDBScraper(Scraper):
             if cast:
                 movie.set_cast(cast)
         except Exception as e:
+            self._errors += 1
             print("Error: ", e)
 
     def scrapUsrReviews(self, url: URL, movie: Movie):
@@ -177,6 +187,7 @@ class IMDBScraper(Scraper):
                 usr_review.set_text(comment)
                 movie.add_user_review(usr_review)
             except Exception as e:
+                self._errors += 1
                 print("Error: ", e)
 
     def scrapCritReviews(self, url: URL, movie: Movie):
@@ -197,6 +208,7 @@ class IMDBScraper(Scraper):
             rating = int(metascore_header.text.strip())/10
             movie.set_crit_avr_rating(rating)
         except Exception as e:
+            self._errors += 1
             print("Error: ", e)
 
          # encontra cada bloco de review
@@ -208,6 +220,7 @@ class IMDBScraper(Scraper):
                 int_review_count = int(reviewCount)
                 movie.set_crit_rev_count(int_review_count)
             except Exception as e:
+                self._errors += 1
                 print("Error: ", e)
             
             try:
@@ -224,8 +237,10 @@ class IMDBScraper(Scraper):
                         rev.set_text(text)
                         movie.add_critic_review(rev)
                     except Exception as e:
+                        self._errors += 1
                         print("Error: ", e)
             except Exception as e:
+                self._errors += 1
                 print("Error: ", e)
            
 
@@ -242,8 +257,10 @@ class IMDBScraper(Scraper):
                 new_url = "https://www.imdb.com" + a_tag["href"]
                 parsed_url = urlparse(new_url)
                 clean_url = urlunparse(parsed_url._replace(query=""))
+                self._new_urls_count += 1
                 self.periodic_queue.put(URL(clean_url, URLType.IMDB))
         except Exception as e:
+            self._errors += 1
             print("Error: ", e)
     
     def scrapStreamingPlataforms(self, url:URL, movie: Movie):
@@ -271,41 +288,66 @@ class IMDBScraper(Scraper):
                     plat = Plataform(plataform=label[label.find("on") + 3:], link=href)
                     movie.add_platform(plat)
                 except Exception as e:
+                    self._errors += 1
                     print("Error: ", e)
                 
             driver.quit()
         except Exception as e:
+            self._errors += 1
             print("Error: ", e)
-        
 
     @override
     def scrap(self):
-        url = self.periodic_queue.get()
+        url = self.periodic_queue.get(timeout=5)
 
         if url.get_type() == URLType.END:
             return
 
+        t0 = time.time()
         response = requests.get(url.get_url(), headers=self.headers)
+        self.end_phase("Request", t0)
 
         if not response.ok:
-            print(f"Nao foi possivel obter o html de {url}")
-            print(f"Conteudo retornado:")
-            print(response.content)
+            self._errors += 1
             return
 
         movie = Movie()
         movie.set_url(url=url.get_url())
         site = BeautifulSoup(response.content, "html.parser")
 
+        t0 = time.time()
         if self.scrapJSONLD(site, movie) == 1:
+            self.end_phase("JsonLd", t0)
             return
+        self.end_phase("JsonLd", t0)
+
+        t0 = time.time()
         self.scrapDirector(site, movie)
+        self.end_phase("Diretores", t0)
+
+        t0 = time.time()
         self.scrapCast(site, movie)
+        self.end_phase("Cast", t0)
+
+        t0 = time.time()
         self.scrapUsrReviews(url, movie)
+        self.end_phase("Reviews de usuários", t0)
+
+        t0 = time.time()
         self.scrapCritReviews(url, movie)
+        self.end_phase("Reviews de críticos", t0)
+
+        t0 = time.time()
         self.scrapNewMovies(site)
+        self.end_phase("Novos filmes", t0)
+
+        t0 = time.time()
         self.scrapStreamingPlataforms(url, movie)
+        self.end_phase("Plataformas", t0)
+
+        t0 = time.time()
         self.storage.store_movie(movie, URLType.IMDB)
+        self.end_phase("Armazenamento", t0)
 
 
 # Lista de infos:
