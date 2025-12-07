@@ -7,7 +7,7 @@ from pathlib import Path
 
 class Storage(Observed):
     
-    def __init__(self, threshold: int = 20) -> None:
+    def __init__(self, threshold: int = 200) -> None:
         super().__init__()
         self.scrapers = {}
         self.threshold = threshold

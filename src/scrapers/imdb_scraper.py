@@ -308,7 +308,7 @@ class IMDBScraper(Scraper):
             service = Service()
             service.startup_timeout = 20
             driver = webdriver.Chrome(service=service, options=options)
-            driver.set_page_load_timeout(20) 
+            driver.set_page_load_timeout(30) 
             try:
                 driver.get(url.get_url())
                 time.sleep(2)  # espera carregar o conteúdo dinâmico
