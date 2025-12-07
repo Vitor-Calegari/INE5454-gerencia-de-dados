@@ -24,6 +24,7 @@ class Movie:
         self.usr_avr_recommendation = None
         self.usr_reviews = []
         self.usr_rev_count = None
+        self.poster_link = None
     
     # Overloaded ==
     def __eq__(self, other) -> bool:
@@ -152,6 +153,9 @@ class Movie:
     def get_usr_reviews_count(self) -> int | None:
         return self.usr_rev_count
     
+    def get_poster_link(self) -> str | None:
+        return self.poster_link
+    
     # Setters -----------------------
     def set_title(self, title: str | None) -> None:
         self.title = title
@@ -192,7 +196,7 @@ class Movie:
     def set_crit_rev_count(self, reviews_count: int) -> None:
         self.crit_rev_count = reviews_count
     
-    def set_crit_avr_recommendation(self, recommendation) -> int | None:
+    def set_crit_avr_recommendation(self, recommendation) -> None:
         self.crit_avr_recommendation = recommendation
     
     def set_usr_avr_rating(self, rating: float) -> None:
@@ -204,8 +208,11 @@ class Movie:
     def set_usr_rev_count(self, reviews_count: int) -> None:
         self.usr_rev_count = reviews_count
     
-    def set_usr_avr_recommendation(self, recommendation) -> int | None:
+    def set_usr_avr_recommendation(self, recommendation) -> None:
         self.usr_avr_recommendation = recommendation
+    
+    def set_poster_link(self, poster) -> None:
+        self.poster_link = poster
 
     # List insertion methods
     def add_url(self, url: str) -> None:

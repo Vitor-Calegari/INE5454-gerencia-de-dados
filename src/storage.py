@@ -7,7 +7,7 @@ from pathlib import Path
 
 class Storage(Observed):
     
-    def __init__(self, threshold: int = 10) -> None:
+    def __init__(self, threshold: int = 20) -> None:
         super().__init__()
         self.scrapers = {}
         self.threshold = threshold
@@ -48,24 +48,35 @@ class Storage(Observed):
                         "url": movie.get_url(),
                         "titulo": movie.get_title(),
                         "generos": movie.get_genres(),
-                        "data de lançamento nos cinemas": movie.get_release_date(),
+                        "data de lançamento": movie.get_release_date(),
                         "classificacao indicativa": movie.get_content_rating(),
                         "sinopse": movie.get_synopsis(),
                         "duracao": movie.get_length(),
-                        "diretor": ", ".join(movie.get_directors()),
-                        "cast": movie.get_cast(),
-                        "media_crit": movie.get_crit_avr_rating(),
-                        "reviews_crit": [
+                        "diretor": movie.get_directors(),
+                        "elenco": movie.get_cast(),
+                        "onde assistir": [
                             {
-                                "avaliacao": r.get_rating(),
+                                "plataforma": p.get_plataform(),
+                                "link": p.get_link()
+                            } for p in movie.get_platforms()
+                        ],
+                        "link do poster": movie.get_poster_link(),
+                        "nota média dos criticos": movie.get_crit_avr_rating(),
+                        "taxa de recomendação dos críticos": movie.get_crit_avr_recommendation(),
+                        "quantidade de reviews de críticos": movie.get_crit_reviews_count(),
+                        "reviews de críticos": [
+                            {
+                                "avaliação (nota até 10)": r.get_rating(),
                                 "texto": r.get_text(),
                                 "data": r.get_date()
                             } for r in movie.get_crit_reviews()
                         ],
-                        "media_usr": movie.get_usr_avr_rating(),
-                        "reviews_usr": [
+                        "nota média dos usuários": movie.get_usr_avr_rating(),
+                        "taxa de recomendação dos usuários": movie.get_usr_avr_recommendation(),
+                        "quantidade de reviews de usuários": movie.get_usr_reviews_count(),
+                        "reviews de usuários": [
                             {
-                                "avaliacao": r.get_rating(),
+                                "avaliação (nota até 10)": r.get_rating(),
                                 "texto": r.get_text(),
                                 "data": r.get_date()
                             } for r in movie.get_usr_reviews()

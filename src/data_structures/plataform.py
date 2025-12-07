@@ -6,6 +6,12 @@ class Plataform:
         self.plataform = plataform
         self.link = link
     
+    def get_plataform(self):
+        return self.plataform
+    
+    def get_link(self):
+        return self.link
+    
     def __str__(self):
         return f"{self.plataform}: {self.link}"
     
