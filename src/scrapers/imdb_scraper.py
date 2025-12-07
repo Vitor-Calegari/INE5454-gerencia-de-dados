@@ -19,6 +19,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import TimeoutException, WebDriverException
 import time
+from queue import Empty
 import pandas as pd
 
 
@@ -83,7 +84,7 @@ class IMDBScraper(Scraper):
                     movie.set_synopsis((data.get("description")).strip())
                 except Exception as e:
                     self._errors += 1
-                print(f"[ERROR] Falha ao obter sinopse na URL {url_str}. Erro: {e}")
+                    print(f"[ERROR] Falha ao obter sinopse na URL {url_str}. Erro: {e}")
 
                 try:
                     duration = data.get("duration")
@@ -93,14 +94,14 @@ class IMDBScraper(Scraper):
                             movie.set_length(formatted.strip())
                 except Exception as e:
                     self._errors += 1
-                print(f"[ERROR] Falha ao obter duração do filme na URL {url_str}. Erro: {e}")
+                    print(f"[ERROR] Falha ao obter duração do filme na URL {url_str}. Erro: {e}")
 
                 # Extracting content rating
                 try:
                     movie.set_content_rating((data.get("contentRating")).strip())
                 except Exception as e:
                     self._errors += 1
-                print(f"[ERROR] Falha ao obter a classificação indicativa na URL {url_str}. Erro: {e}")
+                    print(f"[ERROR] Falha ao obter a classificação indicativa na URL {url_str}. Erro: {e}")
 
                 # Extracting user ratings
                 aggregate_rating = data.get("aggregateRating", {})
@@ -109,14 +110,14 @@ class IMDBScraper(Scraper):
                     movie.set_usr_avr_rating(float(ratingValue))
                 except Exception as e:
                     self._errors += 1
-                print(f"[ERROR] Falha ao obter nota média de reviews usuários na URL {url_str}. Erro: {e}")
+                    print(f"[ERROR] Falha ao obter nota média de reviews usuários na URL {url_str}. Erro: {e}")
 
                 try:
                     ratingCount = aggregate_rating.get("ratingCount")
                     movie.set_usr_rev_count(int(ratingCount))
                 except Exception as e:
                     self._errors += 1
-                print(f"[ERROR] Falha ao obter quantidade de reviews de usuários na URL {url_str}. Erro: {e}")
+                    print(f"[ERROR] Falha ao obter quantidade de reviews de usuários na URL {url_str}. Erro: {e}")
                 
                 return 0
             else:
@@ -135,6 +136,7 @@ class IMDBScraper(Scraper):
                 if img_tag and 'src' in img_tag.attrs:
                     movie.set_poster_link(img_tag['src'].strip())
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter link do poster na URL {movie.get_url()}. Erro: {e}")
         
     def scrapDirector(self, site: BeautifulSoup, movie: Movie):
@@ -213,8 +215,9 @@ class IMDBScraper(Scraper):
                         movie.add_user_review(usr_review)
                     except Exception as e:
                         self._errors += 1
-                print("Error: ", e)
+                        print(f"[ERROR] Falha ao processar uma review de usuário na URL {usr_review_url}. Erro: {e}")
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter ou processar reviews de usuários na URL {usr_review_url}. Erro: {e}")
 
     def scrapCritReviews(self, url: URL, movie: Movie):
@@ -236,7 +239,7 @@ class IMDBScraper(Scraper):
                 movie.set_crit_avr_rating(rating)
             except Exception as e:
                 self._errors += 1
-            print(f"[ERROR] Falha ao obter nota média de reviews de crítico na URL {crit_review_url}. Erro: {e}")
+                print(f"[ERROR] Falha ao obter nota média de reviews de crítico na URL {crit_review_url}. Erro: {e}")
 
             # encontra cada bloco de review
             script_tag = reviews_site.find("script", type="application/json")
@@ -248,7 +251,7 @@ class IMDBScraper(Scraper):
                     movie.set_crit_rev_count(int_review_count)
                 except Exception as e:
                     self._errors += 1
-                print(f"[ERROR] Falha ao obter quantidade de reviews de crítico na URL {crit_review_url}. Erro: {e}")
+                    print(f"[ERROR] Falha ao obter quantidade de reviews de crítico na URL {crit_review_url}. Erro: {e}")
                 
                 try:
                     reviews = data['props']['pageProps']['contentData']['data']['title']['metacritic']['reviews']['edges']
@@ -265,11 +268,12 @@ class IMDBScraper(Scraper):
                             movie.add_critic_review(rev)
                         except Exception as e:
                             self._errors += 1
-                        print(f"[ERROR] Falha ao obter uma review de crítico na URL {crit_review_url}. Erro: {e}")
+                            print(f"[ERROR] Falha ao obter uma review de crítico na URL {crit_review_url}. Erro: {e}")
                 except Exception as e:
+                    self._errors += 1
                     print(f"[ERROR] Falha ao obter reviews de crítico na URL {crit_review_url}. Erro: {e}")
         except Exception as e:
-                self._errors += 1
+            self._errors += 1
             print(f"[ERROR] Falha ao obter ou processar reviews de críticos na URL {crit_review_url}. Erro: {e}")
            
 
@@ -288,7 +292,7 @@ class IMDBScraper(Scraper):
                         parsed_url = urlparse(new_url)
                         clean_url = urlunparse(parsed_url._replace(query=""))
                         self._new_urls_count += 1
-                self.periodic_queue.put(URL(clean_url, URLType.IMDB))
+                        self.periodic_queue.put(URL(clean_url, URLType.IMDB))
         except Exception as e:
             self._errors += 1
             print(f"[ERROR] Falha ao processar seção 'more like this' em {url_str}. Erro: {e}")
@@ -304,92 +308,111 @@ class IMDBScraper(Scraper):
             service = Service()
             service.startup_timeout = 20
             driver = webdriver.Chrome(service=service, options=options)
-            driver.get(url.get_url())
-            time.sleep(2)  # espera carregar o conteúdo dinâmico
-            # encontra todos os <a> com essa classe
-            stream_links = driver.find_elements(
-                By.XPATH,
-                "//a[contains(@class, 'ipc-lockup-overlay') and contains(@class, 'ipc-focusable') and contains(@aria-label, 'Watch on')]"
-            )
+            driver.set_page_load_timeout(20) 
+            try:
+                driver.get(url.get_url())
+                time.sleep(2)  # espera carregar o conteúdo dinâmico
+                # encontra todos os <a> com essa classe
+                stream_links = driver.find_elements(
+                    By.XPATH,
+                    "//a[contains(@class, 'ipc-lockup-overlay') and contains(@class, 'ipc-focusable') and contains(@aria-label, 'Watch on')]"
+                )
 
-            for link in stream_links:
-                label = link.get_attribute("aria-label") # geralmente diz "Watch on <servico>"
-                href = link.get_attribute("href")  # URL do streaming
-                
-                try:
-                    plat = Plataform(plataform=label[label.find("on") + 3:], link=href)
-                    movie.add_platform(plat)
-                except Exception as e:
-                    self._errors += 1
-                    print(f"[ERROR] Falha ao processar uma plataforma de streaming da URL {url.get_url()}. Erro: {e}")
-                
-            driver.quit()
+                for link in stream_links:
+                    label = link.get_attribute("aria-label") # geralmente diz "Watch on <servico>"
+                    href = link.get_attribute("href")  # URL do streaming
+                    
+                    try:
+                        plat = Plataform(plataform=label[label.find("on") + 3:], link=href)
+                        movie.add_platform(plat)
+                    except Exception as e:
+                        self._errors += 1
+                        print(f"[ERROR] Falha ao processar uma plataforma de streaming da URL {url.get_url()}. Erro: {e}")
+            except Exception as e:
+                self._errors += 1
+                print(f"[ERROR] Falha ao coletar plataformas de streaming da URL {url.get_url()}. Erro: {e}")
+            finally:   
+                driver.quit()
         except TimeoutException as e:
+            self._errors += 1
             print(f"[TIMEOUT] ChromeDriver excedeu o tempo limite ao inicializar. URL: {url.get_url()}. Erro: {e}")
-            return
         except Exception as e:
             self._errors += 1
             print(f"[ERROR] Falha ao coletar plataformas de streaming da URL {url.get_url()}. Erro: {e}")
 
     @override
     def scrap(self):
-        url = self.periodic_queue.get(timeout=5)
-
+        try:
+            url = self.periodic_queue.get(timeout=5)
+        except Empty:
+            return  1
+        
         if url.get_type() == URLType.END:
-            return
+            return 1
 
-        print(f"[INFO] Iniciando web scraping da URL: {url.get_url()}")
         t0 = time.time()
         response = requests.get(url.get_url(), headers=self.headers)
         self.end_phase("Request", t0)
 
         if not response.ok:
+            print(f"[ERROR] Nao foi possivel obter o html de {url.get_url()}")
+            print(f"Conteudo retornado:")
+            print(response.content)
             self._errors += 1
-            return
+            return 1
 
-        movie = Movie()
-        movie.set_url(url=url.get_url())
         site = BeautifulSoup(response.content, "html.parser")
+        if site:
+            print(f"[INFO] Iniciando web scraping da URL: {url.get_url()}")
+            movie = Movie()
+            movie.set_url(url=url.get_url())
+            
 
-        t0 = time.time()
-        if self.scrapJSONLD(site, movie) == 1:
-            print(f"[ERROR] Nenhum título foi encontrado na URL: {url.get_url()}. O scraping desta página será interrompido.")
+            t0 = time.time()
+            if self.scrapJSONLD(site, movie) == 1:
+                self._errors += 1
+                print(f"[ERROR] Nenhum título foi encontrado na URL: {url.get_url()}. O scraping desta página será interrompido.")
+                self.end_phase("JsonLd", t0)
+                return 1
             self.end_phase("JsonLd", t0)
-            return
-        self.end_phase("JsonLd", t0)
-        self.scrapPoster(site, movie)
-        
+            
+            t0 = time.time()
+            self.scrapPoster(site, movie)
+            self.end_phase("Poster", t0)
 
-        t0 = time.time()
-        self.scrapDirector(site, movie)
-        self.end_phase("Diretores", t0)
+            t0 = time.time()
+            self.scrapDirector(site, movie)
+            self.end_phase("Diretores", t0)
 
-        t0 = time.time()
-        self.scrapCast(site, movie)
-        self.end_phase("Cast", t0)
+            t0 = time.time()
+            self.scrapCast(site, movie)
+            self.end_phase("Cast", t0)
 
-        t0 = time.time()
-        self.scrapUsrReviews(url, movie)
-        self.end_phase("Reviews de usuários", t0)
+            t0 = time.time()
+            self.scrapUsrReviews(url, movie)
+            self.end_phase("Reviews de usuários", t0)
 
-        t0 = time.time()
-        self.scrapCritReviews(url, movie)
-        self.end_phase("Reviews de críticos", t0)
+            t0 = time.time()
+            self.scrapCritReviews(url, movie)
+            self.end_phase("Reviews de críticos", t0)
 
-        t0 = time.time()
-        self.scrapNewMovies(site, url.get_url())
-        self.end_phase("Novos filmes", t0)
+            t0 = time.time()
+            self.scrapNewMovies(site, url.get_url())
+            self.end_phase("Novos filmes", t0)
 
-        t0 = time.time()
-        self.scrapStreamingPlataforms(url, movie)
-        self.count += 1
-        self.end_phase("Plataformas", t0)
+            t0 = time.time()
+            self.scrapStreamingPlataforms(url, movie)
+            self.end_phase("Plataformas", t0)
 
-        t0 = time.time()
-        self.storage.store_movie(movie, URLType.IMDB)
-        print(f"[INFO] Concluída a coleta de dados da URL: {url.get_url()}. Quantidade de filmes coletados do IMDB: {self.count}")
-        self.end_phase("Armazenamento", t0)
-
+            t0 = time.time()
+            self.storage.store_movie(movie, URLType.IMDB)
+            self.end_phase("Armazenamento", t0)
+            
+            self.count += 1
+            print(f"[INFO] Concluída a coleta de dados da URL: {url.get_url()}. Quantidade de filmes coletados do IMDB: {self.count}")
+            return 0
+        else:
+            return 1
 
 # Lista de infos:
 # url -> Ok

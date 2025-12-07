@@ -7,12 +7,13 @@ from typing import override
 from src.storage import Storage
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
-import logging
 import requests
 from datetime import datetime
 import re
 import json
+import time
 from dateutil.parser import parse
+from queue import Empty
 
 
 class LettrScraper(Scraper):
@@ -29,19 +30,25 @@ class LettrScraper(Scraper):
 
     @override
     def scrap(self):
-        url = self.periodic_queue.get(timeout=5)
+        try:
+            url = self.periodic_queue.get(timeout=5)
+        except Empty:
+            return  1
 
         if url.get_type() == URLType.END:
-            return
+            return 1
 
         url_str = url.get_url()
+        t0 = time.time()
         response = requests.get(url_str, headers=self.headers)
+        self.end_phase("Request", t0)
 
         if not response.ok:
             print(f"[ERROR] Nao foi possivel obter o html de {url_str}")
             print(f"Conteudo retornado:")
             print(response.content)
-            return
+            self._errors += 1
+            return 1
 
         site = BeautifulSoup(response.content, "html.parser")
 
@@ -50,27 +57,48 @@ class LettrScraper(Scraper):
             movie = Movie()
             movie.set_url(url=url_str)
 
+            t0 = time.time()
             title, directors = self.get_details(site, url_str)
             if not title:
+                self._errors += 1
                 print(f"[ERROR] Nenhum título foi encontrado na URL: {url_str}. O scraping desta página será interrompido.")
-                return
+                self.end_phase("Título e diretores", t0)
+                return 1
             movie.set_title(title)
             movie.set_directors(directors)
+            self.end_phase("Título e diretores", t0)
 
+            t0 = time.time()
             poster = self.get_poster(site, url_str)
             movie.set_poster_link(poster)
+            self.end_phase("Poster", t0)
+            
+            t0 = time.time()
             synopsis = self.get_synopsis(site, url_str)
             movie.set_synopsis(synopsis)
+            self.end_phase("Sinopse", t0)
 
             section = site.find("div", {"id": "tabbed-content"})
             if section:
+                t0 = time.time()
                 movie.set_cast(self.get_cast(section, url_str))
+                self.end_phase("Cast", t0)
+                
+                t0 = time.time()
                 movie.set_release_date(self.get_release_date(section, url_str))
+                self.end_phase("Data de lançamento", t0)
+                
+                t0 = time.time()
                 movie.set_genres(self.get_genres(section, url_str))
+                self.end_phase("Generos", t0)
 
+            t0 = time.time()
             movie.set_length(self.get_length(site, url_str))
+            self.end_phase("Duração", t0)
 
+            t0 = time.time()
             self.scrap_reviews(site, movie)
+            self.end_phase("Reviews de usuários", t0)
 
             try:
                 with sync_playwright() as p:
@@ -81,25 +109,41 @@ class LettrScraper(Scraper):
                     try:
                         page.goto(url.get_url(), wait_until="domcontentloaded")
 
+                        t0 = time.time()
                         avr, count = self.get_ratings_stats(page, url_str)
                         movie.set_usr_avr_rating(avr)
-                        movie.set_usr_rev_count(count)    
+                        movie.set_usr_rev_count(count) 
+                        self.end_phase("Nota média e quantidade de reviews de usuários", t0)   
 
+                        t0 = time.time()
                         links = self.get_similar_movies(page, url_str)            
                         for link in links:
                             self.periodic_queue.put(URL(link, URLType.LTTR))
-                            
+                            self._new_urls_count += 1
+                        self.end_phase("Novos filmes", t0)
+                        
+                        t0 = time.time()
                         movie.set_platforms(self.get_plataforms(page, url_str))
+                        self.end_phase("Plataformas", t0)
+                        
                     except Exception as e:
+                        self._errors += 1
                         print(f"[ERROR] Falha ao processar URL {url_str} no Playright. Erro: {e}")
                     finally:
                         browser.close()
             except Exception as e:
+                self._errors += 1
                 print(f"[ERROR] Falha ao iniciar Playright ou navegador para URL {url_str}. Erro: {e}")
+                            
+            t0 = time.time()
+            self.storage.store_movie(movie, URLType.LTTR)
+            self.end_phase("Armazenamento", t0)
             
             self.count += 1
             print(f"[INFO] Concluída a coleta de dados da URL: {url_str}. Quantidade de filmes coletados do Letterboxd: {self.count}")
-            self.storage.store_movie(movie, URLType.LTTR)
+            return 0
+        else:
+            return 1
 
     def get_details(self, site, url_str):
         title = None
@@ -115,6 +159,7 @@ class LettrScraper(Scraper):
                 if directors:
                     director_names = [a.text.strip() for a in directors]
             except Exception as e:
+                self._errors += 1
                 print(f"[ERROR] Falha ao obter os diretores na URL {url_str}. Erro: {e}")
         return title, director_names
     
@@ -133,6 +178,7 @@ class LettrScraper(Scraper):
                 if data:
                     link = data.get("image").strip()
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter o link do poster na URL {url_str}. Erro: {e}")
         return link
 
@@ -143,6 +189,7 @@ class LettrScraper(Scraper):
             if synopsis_section:
                 synopsis = synopsis_section.find("p").text.strip()
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter a sinopse na URL {url_str}. Erro: {e}")
         return synopsis
 
@@ -155,6 +202,7 @@ class LettrScraper(Scraper):
                 if cast_tags:
                     cast = [a.text.strip() for a in cast_tags]
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter a sinopse na URL {url_str}. Erro: {e}")
         return cast
 
@@ -180,8 +228,10 @@ class LettrScraper(Scraper):
                                         if release_date_format < release_date_final:
                                             release_date_final = release_date_format
                                 except Exception as e:
+                                    self._errors += 1
                                     print(f"[ERROR] Falha ao processar data de lançamento na URL {url_str}. Erro: {e}")
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter data de lançamento na URL {url_str}. Erro: {e}")
         return release_date_final
                            
@@ -199,6 +249,7 @@ class LettrScraper(Scraper):
                         for a in genre_tags
                     ] # troca para sci-fi para deixar igual aos outros sites
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter generos na URL {url_str}. Erro: {e}")
         return genres
 
@@ -214,6 +265,7 @@ class LettrScraper(Scraper):
                 mins = lenght % 60
                 lenght_format = f"{hour:02d}:{mins:02d}:00"
         except:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter duração na URL {url_str}. Erro: {e}")
         return lenght_format
     
@@ -229,8 +281,10 @@ class LettrScraper(Scraper):
                         link = items.nth(i).locator("div.react-component").get_attribute("data-item-link")
                         links.append("https://letterboxd.com" + link)
                     except Exception as e:
+                        self._errors += 1
                         print(f"[ERROR] Falha ao obter um filme similar na URL {url_str}. Erro: {e}")
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter filmes similares na URL {url_str}. Erro: {e}")
         return links
 
@@ -251,13 +305,16 @@ class LettrScraper(Scraper):
                         try:
                             num_ratings = int(numbers[1].replace(",", ""))
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar quantidade de reviews de usuários em {url_str}. Erro: {e}")
                         try:
                             num_average = float(numbers[0])
                             num_average_format = (num_average * 10)/5
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar a nota média de usuários em {url_str}. Erro: {e}")
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter quantidade e nota média das reviews usuários em {url_str}. Erro: {e}")
                         
         return num_average_format, num_ratings
@@ -290,10 +347,12 @@ class LettrScraper(Scraper):
                             if platform_name and platform_link:
                                 plataforms.append(Plataform(platform_name, platform_link))
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar uma plataforma de streaming em {url_str}. Erro: {e}")
                         
         except Exception as e:
-                print(f"[ERROR] Falha ao obter plataformas de streaming em {url_str}. Erro: {e}")
+            self._errors += 1
+            print(f"[ERROR] Falha ao obter plataformas de streaming em {url_str}. Erro: {e}")
         return plataforms
 
     def scrap_reviews(self, site, movie):
@@ -336,8 +395,10 @@ class LettrScraper(Scraper):
                                     r.set_text(review_div.text)
                                     add_review(r)
                                 except Exception as e:
+                                    self._errors += 1
                                     print(f"[ERROR] Falha ao processar uma review de usuário na URL {url_reviews}. Erro: {e}")
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter reviews de usuários na URL {url_reviews}. Erro: {e}")
             
 

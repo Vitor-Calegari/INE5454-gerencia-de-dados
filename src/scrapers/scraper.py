@@ -39,13 +39,14 @@ class Scraper(ABC):
             
             # mede tempo por filme
             start = time.perf_counter()
-            self.scrap()
-            end = time.perf_counter()
-            elapsed = end - start
+            resposta = self.scrap()
+            if resposta == 0:
+                end = time.perf_counter()
+                elapsed = end - start
 
-            # salva o tempo do filme atual
-            with self._lock:
-                self._scrap_times.append(elapsed)
+                # salva o tempo do filme atual
+                with self._lock:
+                    self._scrap_times.append(elapsed)
 
         # fim do crawler
         self._end_time = time.perf_counter()
@@ -98,7 +99,7 @@ class Scraper(ABC):
             print(f"Erros durante scraping:   {errors}")
             print("\n--- Tempo médio por etapa ---")
             for phase, times in phase_times.items():
-                print(f"{phase:20s} {sum(times)/len(times):.4f} s (amostras={len(times)})")
+                print(f"{phase:40s} {sum(times)/len(times):.4f} s (amostras={len(times)})")
         else:
             print(f"Nenhum filme coletado.")    
         print("==========================================\n")

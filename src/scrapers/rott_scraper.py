@@ -20,6 +20,7 @@ from selenium.common.exceptions import TimeoutException, WebDriverException, NoS
 from selenium.webdriver.chrome.service import Service
 from playwright.sync_api import sync_playwright
 import urllib.parse
+from queue import Empty
 
 
 class RottScraper(Scraper):
@@ -59,6 +60,7 @@ class RottScraper(Scraper):
                         director_names = [(d["name"]).strip() for d in directors]
                         movie.set_directors(director_names)
                 except Exception as e:
+                    self._errors += 1
                     print(f"[ERROR] Falha ao obter os diretores na URL {url_str}. Erro: {e}")
 
                 try:
@@ -67,6 +69,7 @@ class RottScraper(Scraper):
                         genre_list = [g.strip() for genre in genres for g in genre.split("&")]
                         movie.set_genres(genre_list)
                 except Exception as e:
+                    self._errors += 1
                     print(f"[ERROR] Falha ao obter os gêneros na URL {url_str}. Erro: {e}")
 
                 try:
@@ -75,11 +78,13 @@ class RottScraper(Scraper):
                         content_rating = content_rating.strip()
                         movie.set_content_rating(content_rating)
                 except Exception as e:
+                    self._errors += 1
                     print(f"[ERROR] Falha ao obter a classificação indicativa na URL {url_str}. Erro: {e}")
                 return 0
             else:
                 return 1
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter JSON-LD da URL {url_str}. Erro: {e}")
             return 1
     
@@ -93,6 +98,7 @@ class RottScraper(Scraper):
                     synopsis = synopsis_tag.get_text(strip=True)
                     movie.set_synopsis(synopsis)
             except Exception as e:
+                self._errors += 1
                 print(f"[ERROR] Falha ao obter a sinopse na URL {url_str}. Erro: {e}")
             
             dates = []
@@ -116,6 +122,7 @@ class RottScraper(Scraper):
                                     dt = pd.to_datetime(cleaned).strftime("%Y-%m-%d").strip()
                                     dates.append(dt)
                             except Exception as e:
+                                self._errors += 1
                                 print(f"[ERROR] Falha ao processar a data de lançamento na URL {url_str}. Erro: {e}")
 
                         elif label_tag and label_tag.text.strip().lower() == "runtime":
@@ -127,8 +134,10 @@ class RottScraper(Scraper):
                                     length_formatted = str(pd_length).split()[-1]
                                     movie.set_length(length_formatted)
                             except Exception as e:
+                                self._errors += 1
                                 print(f"[ERROR] Falha ao processar a duração do filme na URL {url_str}. Erro: {e}")
                     except Exception as e:
+                        self._errors += 1
                         print(f"[ERROR] Falha ao processar uma informação de categoria na URL {movie.url}. Erro: {e}")
 
             if dates:
@@ -162,8 +171,10 @@ class RottScraper(Scraper):
                                 if name:
                                     movie.add_cast_member(name)
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar ator no link {url_cast}. Erro: {e}")
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao obter ou processar o cast na URL {url_cast}. Erro: {e}")
 
     def scrapRevData(self, site: BeautifulSoup, movie: Movie):
@@ -184,18 +195,21 @@ class RottScraper(Scraper):
                             aud_review_count = int(aud["reviewCount"])
                             movie.set_usr_rev_count(aud_review_count)
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar review de usuário (quantidade) na URL {url_str}. Erro: {e}")
 
                         try:
                             aud_score_percent = int(aud["scorePercent"].replace("%", ""))
                             movie.set_usr_avr_recommendation(aud_score_percent)
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar review de usuário (percentual de recomendação) na URL {url_str}. Erro: {e}")
 
                         try:
                             aud_avg_rating = float(aud["averageRating"])*2   # *2 pra transformar nota até 5 em até 10
                             movie.set_usr_avr_rating(aud_avg_rating)
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar review de usuário (nota média) na URL {url_str}. Erro: {e}")
 
                     if crit:
@@ -203,24 +217,28 @@ class RottScraper(Scraper):
                             crit_review_count = int(crit["reviewCount"])
                             movie.set_crit_rev_count(crit_review_count)
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar review de crítico (quantidade) na URL {url_str}. Erro: {e}")
 
                         try:
                             crit_score_percent = int(crit["scorePercent"].replace("%", ""))
                             movie.set_crit_avr_recommendation(crit_score_percent)
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar review de crítico (percentual de recomendação) na URL {url_str}. Erro: {e}")
 
                         try:
                             crit_avg_rating = float(crit["averageRating"])
                             movie.set_crit_avr_rating(crit_avg_rating)
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar review de crítico (nota média) na URL {url_str}. Erro: {e}")
                     poster = data["primaryImageUrl"]
                     if poster:
                         movie.set_poster_link(poster)
                     
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao processar os dados de reviews na URL {url_str}. Erro: {e}")
 
     def parse_rotten_date(self, date_str, url_rev):
@@ -269,6 +287,7 @@ class RottScraper(Scraper):
                 dt = pd.to_datetime(s)
                 return dt.strftime("%Y-%m-%d")
         except:
+            self._errors += 1
             print(f"[ERROR] Falha ao processar data de uma reviews na URL {url_rev} no Playright. Erro: {e}")
         
     def scrapUsrReviews(self, movie: Movie, url: str):
@@ -282,7 +301,7 @@ class RottScraper(Scraper):
 
                 try:
                     page.goto(url_rev, wait_until="domcontentloaded")
-                    page.wait_for_selector("review-card", timeout=5000)
+                    page.wait_for_selector("review-card", timeout=10000)
 
                     cards = page.locator("review-card")
                     count = cards.count()
@@ -317,12 +336,15 @@ class RottScraper(Scraper):
                                 movie.add_user_review(review)
                             
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar uma review na URL {url_rev} no Playright. Erro: {e}")
                 except Exception as e:
+                    self._errors += 1
                     print(f"[ERROR] Falha ao processar URL {url_rev} no Playright. Erro: {e}")
                 finally:
                     browser.close()
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao iniciar Playright ou navegador para URL {url_rev}. Erro: {e}")
 
     def scrapCritReviews(self, movie: Movie, url: str):
@@ -336,7 +358,7 @@ class RottScraper(Scraper):
 
                 try:
                     page.goto(url_rev, wait_until="domcontentloaded")
-                    page.wait_for_selector("review-card", timeout=5000)
+                    page.wait_for_selector("review-card", timeout=10000)
 
                     cards = page.locator("review-card")
                     count = cards.count()
@@ -389,12 +411,15 @@ class RottScraper(Scraper):
                                 movie.add_critic_review(review)
                             
                         except Exception as e:
+                            self._errors += 1
                             print(f"[ERROR] Falha ao processar uma review na URL {url_rev} no Playright. Erro: {e}")
                 except Exception as e:
+                    self._errors += 1
                     print(f"[ERROR] Falha ao processar URL {url_rev} no Playright. Erro: {e}")
                 finally:
                     browser.close()
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao iniciar Playright ou navegador para URL {url_rev}. Erro: {e}")
 
     def scrapNewMovies(self, site: BeautifulSoup, url_str: str):
@@ -406,7 +431,9 @@ class RottScraper(Scraper):
                     href = link_tag.get("href")
                     if href and href.startswith("/m/"):  # garante que é link de filme
                         self.periodic_queue.put(URL("https://www.rottentomatoes.com" + href.strip(), URLType.ROTT))
+                        self._new_urls_count += 1
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao processar seção 'more like this' em {url_str}. Erro: {e}")
 
     # Pega o link do click.justwatch.com e tenta identificar a plataforma com base no domínio final (param 'r=' do redirect).
@@ -443,6 +470,7 @@ class RottScraper(Scraper):
 
             return None  # plataforma não reconhecida
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao normalizar a plataforma a partir do link {link}. Erro: {e}")
             return None
     
@@ -455,13 +483,17 @@ class RottScraper(Scraper):
             options.add_argument("--headless")  # roda sem abrir janela
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
+            options.page_load_strategy = 'eager'
             service = Service()
             service.startup_timeout = 10
             driver = webdriver.Chrome(service=service, options=options)
+            driver.set_page_load_timeout(20) 
         except TimeoutException as e:
+            self._errors += 1
             print(f"[TIMEOUT] ChromeDriver excedeu o tempo limite ao inicializar. URL: {url.get_url()}. Erro: {e}")
             return
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao iniciar ChromeDriver para URL {url.get_url()}. Pulando coleta de plataformas de streaming. Erro: {e}")
             return
         
@@ -473,6 +505,7 @@ class RottScraper(Scraper):
                     By.XPATH, "//div[@data-wheretowatchmanager='jwContainer']//iframe[contains(@class, 'jw-widget-iframe')]"
                 )
             except NoSuchElementException:
+                self._errors += 1
                 print(f"[TIMEOUT] Iframe não encontrado em {url.get_url()}")
                 iframe = None
     
@@ -484,6 +517,7 @@ class RottScraper(Scraper):
                 try:
                     offers = driver.find_elements(By.XPATH, "//div[contains(@class,'jw-offer')]/a")
                 except NoSuchElementException:
+                    self._errors += 1
                     print(f"[ERROR] Nenhuma plataforma encontrada no iframe para: {url.get_url()}")
                     offers = []
                 
@@ -499,8 +533,10 @@ class RottScraper(Scraper):
                             movie.add_platform(plataform)
 
         except WebDriverException as e:
+            self._errors += 1
             print(f"[ERROR] Ocorreu um erro no WebDriver para a URL {url.get_url()}. Erro: {e}")
         except Exception as e:
+            self._errors += 1
             print(f"[ERROR] Falha ao coletar dados dinâmicos da URL {url.get_url()}. Erro: {e}")
         finally:
             # sai do iframe e encerra
@@ -508,20 +544,25 @@ class RottScraper(Scraper):
 
     @override
     def scrap(self):
-        url = self.periodic_queue.get(timeout=5)
-
+        try:
+            url = self.periodic_queue.get(timeout=5)
+        except Empty:
+            return  1
+        
         if (url.get_type() == URLType.END):
-            return
+            return 1
         
         url_str = url.get_url()
-        
+        t0 = time.time()
         response = requests.get(url_str, headers=self.headers)
+        self.end_phase("Request", t0)
 
         if not response.ok:
             print(f"[ERROR] Nao foi possivel obter o html de {url_str}")
             print(f"Conteudo retornado:")
             print(response.content)
-            return
+            self._errors += 1
+            return 1
         
         
         site = BeautifulSoup(response.content, "html.parser")
@@ -529,18 +570,47 @@ class RottScraper(Scraper):
             print(f"[INFO] Iniciando web scraping da URL: {url_str}")
             movie = Movie()
             movie.set_url(url=url_str)
+            
+            t0 = time.time()
             if self.scrapJSONLD(site, movie) == 1:
                 print(f"[ERROR] Nenhum título foi encontrado na URL: {url_str}. O scraping desta página será interrompido.")
-                return
+                self.end_phase("JsonLd", t0)
+                return 1
+            self.end_phase("JsonLd", t0)
             
+            t0 = time.time()
             self.scrapMovieInfo(site, movie)
+            self.end_phase("Principais informações do filme", t0)
+            
+            t0 = time.time()
             self.scrapCast(movie, url_str)
+            self.end_phase("Cast", t0)
+            
+            t0 = time.time()
             self.scrapRevData(site, movie)
+            self.end_phase("Dados sobre reviews", t0)
+            
+            t0 = time.time()
             self.scrapUsrReviews(movie, url_str)
+            self.end_phase("Reviews de usuários", t0)
+            
+            t0 = time.time()
             self.scrapCritReviews(movie, url_str)
+            self.end_phase("Reviews de críticos", t0)
+            
+            t0 = time.time()
             self.scrapDynamicData(url, movie)
+            self.end_phase("Plataformas", t0)
+            
+            t0 = time.time()
             self.scrapNewMovies(site, url_str)
+            self.end_phase("Novos filmes", t0)
+
+            t0 = time.time()
+            self.storage.store_movie(movie, URLType.ROTT)
+            self.end_phase("Armazenamento", t0)
+                        
             self.count += 1
             print(f"[INFO] Concluída a coleta de dados da URL: {url_str}. Quantidade de filmes coletados do Rotten Tomatoes: {self.count}")
-
-            self.storage.store_movie(movie, URLType.ROTT)
+            return 0
+        return 1
