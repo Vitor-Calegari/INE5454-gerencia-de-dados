@@ -4,6 +4,7 @@ class Review:
         self.rating = None
         self.text = None
         self.date = None
+        self.link = None
     
     def get_rating(self) -> float | None:
         return self.rating
@@ -19,6 +20,9 @@ class Review:
 
     def get_date(self) -> str | None:
         return self.date
+    
+    def get_link(self) -> str | None:
+        return self.link
 
     def set_date(self, date: str):
         self.date = date

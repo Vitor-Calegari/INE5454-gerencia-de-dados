@@ -26,10 +26,12 @@ class Movie:
         self.usr_rev_count = None
         self.poster_link = None
 
-        self.usr_avr_ratings = []
-        self.usr_avr_recommendations = []
-        self.crit_avr_ratings = []
-        self.crit_avr_recommendations = []
+        self.usr_avr_ratings = dict()
+        self.usr_avr_recommendations = dict()
+        self.usr_rev_counts = dict()
+        self.crit_avr_ratings = dict()
+        self.crit_avr_recommendations = dict()
+        self.crit_rev_counts = dict()
     
     # Overloaded ==
     def __eq__(self, other) -> bool:
@@ -54,6 +56,23 @@ class Movie:
             return NotImplemented
         
         # urls
+        if len(self.get_url()) == 1:
+            if self.get_usr_avr_rating():
+                self.usr_avr_ratings[self.get_url()[0]] = self.get_usr_avr_rating()
+            if self.get_usr_avr_recommendation():
+                self.usr_avr_recommendations[self.get_url()[0]] = self.get_usr_avr_recommendation()
+            if self.get_usr_reviews_count():
+                self.usr_rev_counts[self.get_url()[0]] = self.get_usr_reviews_count()
+            if self.get_crit_avr_rating():
+                self.crit_avr_ratings[self.get_url()[0]] = self.get_crit_avr_rating()
+            if self.get_crit_avr_recommendation():
+                self.crit_avr_recommendations[self.get_url()[0]] = self.get_crit_avr_recommendation()
+            if self.get_crit_reviews_count():
+                self.crit_rev_counts[self.get_url()[0]] = self.get_crit_reviews_count()
+            for rev in self.usr_reviews:
+                rev.link = self.get_url()[0]
+            for rev in self.crit_reviews:
+                rev.link = self.get_url()[0]
         self.add_url(other.get_url()[0])
         
         # genres
@@ -129,51 +148,55 @@ class Movie:
 
         # user avr rating
         if other.get_usr_avr_rating():
-            self.usr_avr_ratings.append(other.get_usr_avr_rating())
+            self.usr_avr_ratings[other.get_url()[0]] = other.get_usr_avr_rating()
         if self.usr_avr_ratings:
-            avg_usr_rating = sum(self.usr_avr_ratings) / len(self.usr_avr_ratings)
+            avg_usr_rating = sum(self.usr_avr_ratings.values()) / len(self.usr_avr_ratings)
             self.usr_avr_rating = avg_usr_rating
         
         # user avr recommendation
         if other.get_usr_avr_recommendation():
-            self.usr_avr_recommendations.append(other.get_usr_avr_recommendation())
+            self.usr_avr_recommendations[other.get_url()[0]] = other.get_usr_avr_recommendation()
         if self.usr_avr_recommendations:
-            avg_usr_rec = sum(self.usr_avr_recommendations) / len(self.usr_avr_recommendations)
+            avg_usr_rec = sum(self.usr_avr_recommendations.values()) / len(self.usr_avr_recommendations)
             self.usr_avr_recommendation = avg_usr_rec
         
         # user reviews
         for review in other.get_usr_reviews():
+            review.link = other.get_url()[0]
             self.add_user_review(review)
 
         # user reviews count
-        if self.get_usr_reviews_count() and other.get_usr_reviews_count():
-            self.set_usr_rev_count(self.get_usr_reviews_count() + other.get_usr_reviews_count())
-        elif not self.get_usr_reviews_count():
-            self.set_usr_rev_count(other.get_usr_reviews_count())
+        if other.get_usr_reviews_count():
+            self.usr_rev_counts[other.get_url()[0]] = other.get_usr_reviews_count()
+        if self.usr_rev_counts:
+            total_usr_rev_count = sum(self.usr_rev_counts.values())
+            self.usr_rev_count = total_usr_rev_count
         
         # crit avr rating
         if other.get_crit_avr_rating():
-            self.crit_avr_ratings.append(other.get_crit_avr_rating())
+            self.crit_avr_ratings[other.get_url()[0]] = other.get_crit_avr_rating()
         if self.crit_avr_ratings:
-            avg_crit_rating = sum(self.crit_avr_ratings) / len(self.crit_avr_ratings)
+            avg_crit_rating = sum(self.crit_avr_ratings.values()) / len(self.crit_avr_ratings)
             self.crit_avr_rating = avg_crit_rating
         
         # crit avr recommendation
         if other.get_crit_avr_recommendation():
-            self.crit_avr_recommendations.append(other.get_crit_avr_recommendation())
+            self.crit_avr_recommendations[other.get_url()[0]] = other.get_crit_avr_recommendation()
         if self.crit_avr_recommendations:
-            avg_crit_rec = sum(self.crit_avr_recommendations) / len(self.crit_avr_recommendations)
+            avg_crit_rec = sum(self.crit_avr_recommendations.values()) / len(self.crit_avr_recommendations)
             self.crit_avr_recommendation = avg_crit_rec
         
         # crit reviews
         for review in other.get_crit_reviews():
+            review.link = other.get_url()[0]
             self.add_critic_review(review)
 
         # crit reviews count
-        if self.get_crit_reviews_count() and other.get_crit_reviews_count():
-            self.set_crit_rev_count(self.get_crit_reviews_count() + other.get_crit_reviews_count())
-        elif not self.get_crit_reviews_count():
-            self.set_crit_rev_count(other.get_crit_reviews_count())
+        if other.get_crit_reviews_count():
+            self.crit_rev_counts[other.get_url()[0]] = other.get_crit_reviews_count()
+        if self.crit_rev_counts:
+            total_crit_rev_count = sum(self.crit_rev_counts.values())
+            self.crit_rev_count = total_crit_rev_count
         
         # poster link
         if not self.get_poster_link():
@@ -273,8 +296,6 @@ class Movie:
         self.content_rating = content_rating
     
     def set_crit_avr_rating(self, rating: float) -> None:
-        if rating:
-            self.crit_avr_ratings.append(rating)
         self.crit_avr_rating = rating
     
     def set_crit_reviews(self, reviews: list) -> None:
@@ -284,13 +305,9 @@ class Movie:
         self.crit_rev_count = reviews_count
     
     def set_crit_avr_recommendation(self, recommendation) -> None:
-        if recommendation:
-            self.crit_avr_recommendations.append(recommendation)
         self.crit_avr_recommendation = recommendation
     
     def set_usr_avr_rating(self, rating: float) -> None:
-        if rating:
-            self.usr_avr_ratings.append(rating)
         self.usr_avr_rating = rating
     
     def set_usr_reviews(self, reviews: list) -> None:
@@ -300,8 +317,6 @@ class Movie:
         self.usr_rev_count = reviews_count
     
     def set_usr_avr_recommendation(self, recommendation) -> None:
-        if recommendation:
-            self.usr_avr_recommendations.append(recommendation)
         self.usr_avr_recommendation = recommendation
     
     def set_poster_link(self, poster) -> None:

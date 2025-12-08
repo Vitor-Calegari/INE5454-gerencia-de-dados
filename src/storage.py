@@ -136,23 +136,49 @@ class Storage(Observed):
                     ],
                     "link do poster": movie.get_poster_link(),
                     "nota média dos criticos": movie.get_crit_avr_rating(),
+                    "notas dos criticos": [
+                        {"link": link, "nota": nota}
+                        for link, nota in movie.crit_avr_ratings.items()
+                    ],
                     "taxa de recomendação dos críticos": movie.get_crit_avr_recommendation(),
+                    "taxas de recomendação dos críticos": [
+                        {"link": link, "taxa": taxa}
+                        for link, taxa in movie.crit_avr_recommendations.items()
+                    ],
                     "quantidade de reviews de críticos": movie.get_crit_reviews_count(),
+                    "quantidades de reviews dos críticos": [
+                        {"link": link, "quantidade": quant}
+                        for link, quant in movie.crit_rev_counts.items()
+                    ],
                     "reviews de críticos": [
                         {
                             "avaliação (nota até 10)": r.get_rating(),
                             "texto": r.get_text(),
-                            "data": r.get_date()
+                            "data": r.get_date(),
+                            "link": r.get_link()
                         } for r in movie.get_crit_reviews()
                     ],
                     "nota média dos usuários": movie.get_usr_avr_rating(),
+                    "notas dos usuários": [
+                        {"link": link, "nota": nota}
+                        for link, nota in movie.usr_avr_ratings.items()
+                    ],
                     "taxa de recomendação dos usuários": movie.get_usr_avr_recommendation(),
+                    "taxas de recomendação dos usuários": [
+                        {"link": link, "taxa": taxa}
+                        for link, taxa in movie.usr_avr_recommendations.items()
+                    ],
                     "quantidade de reviews de usuários": movie.get_usr_reviews_count(),
+                    "quantidades de reviews dos usuários": [
+                        {"link": link, "quantidade": quant}
+                        for link, quant in movie.usr_rev_counts.items()
+                    ],
                     "reviews de usuários": [
                         {
                             "avaliação (nota até 10)": r.get_rating(),
                             "texto": r.get_text(),
-                            "data": r.get_date()
+                            "data": r.get_date(),
+                            "link": r.get_link()
                         } for r in movie.get_usr_reviews()
                     ]
                 }
