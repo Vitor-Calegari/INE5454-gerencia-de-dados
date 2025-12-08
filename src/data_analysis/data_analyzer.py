@@ -73,17 +73,17 @@ class DataAnalyzer:
             save_path="graphs/tipos_geral.png"
         )
 
-        size_metrics = ["reviews_usr", "sinopse"]
+        size_metrics = ["reviews de usuários", "sinopse"]
         metric_values = {metric: {src: [] for src in sources} for metric in size_metrics}
 
         for movie in self.movies_list:
             src = movie["__source__"]
-            if "reviews_usr" in movie:
+            if "reviews de usuários" in movie:
                 review_values = []
-                for review in movie["reviews_usr"]:
+                for review in movie["reviews de usuários"]:
                     if review['texto'] and review.get("texto"):
                         review_values.append(len(review['texto']))
-                metric_values["reviews_usr"][src].append(np.mean(review_values) if review_values else 0)
+                metric_values["reviews de usuários"][src].append(np.mean(review_values) if review_values else 0)
             if "sinopse" in movie and isinstance(movie["sinopse"], str):
                 metric_values["sinopse"][src].append(len(movie["sinopse"]))
 
@@ -103,279 +103,299 @@ class DataAnalyzer:
             save_path="graphs/tamanho_medio_entradas.png"
         )
 
-    def run_quality_analysis(self):
+    def run_quality_analysis(self, movies):
         """
-        Análise de qualidade dos dados
+        Analisa a qualidade dos dados de filmes com foco em:
+        - Valores inconsistentes
+        - Outliers
+        - Completude
+        - Duplicadas
         """
-        report_lines = []
-        report_lines.append("="*50)
-        report_lines.append("ANÁLISE DE QUALIDADE DOS DADOS")
-        report_lines.append("="*50)
-        report_lines.append("")
         
-        total_movies = len(self.movies_list)
+        print("=" * 60)
+        print("ANÁLISE DE QUALIDADE DOS DADOS DE FILMES")
+        print("=" * 60)
         
-        # 3.1 Valores inconsistentes
-        report_lines.append("3.1 VALORES INCONSISTENTES")
-        report_lines.append("-" * 50)
+        # Preparar figura com subplots
+        fig = plt.figure(figsize=(16, 12))
         
-        inconsistent_data = {
-            "duracao_invalida": 0,
-            "media_crit_fora_range": 0,
-            "media_usr_fora_range": 0,
-            "data_futura": 0,
-            "data_muito_antiga": 0
-        }
+        # 1. ANÁLISE DE COMPLETUDE
+        print("\n1. ANÁLISE DE COMPLETUDE")
+        print("-" * 60)
         
-        for movie in self.movies_list:
-            # Verificar duração (deve ser positiva e razoável)
-            if "duracao" in movie and isinstance(movie["duracao"], str):
-                try:
-                    time_parts = movie["duracao"].split(":")
-                    if len(time_parts) == 3:
-                        hours = int(time_parts[0])
-                        minutes = int(time_parts[1])
-                        total_minutes = hours * 60 + minutes
-                        # Filmes geralmente têm entre 1 min e 500 min
-                        if total_minutes <= 0 or total_minutes > 500:
-                            inconsistent_data["duracao_invalida"] += 1
-                except:
-                    inconsistent_data["duracao_invalida"] += 1
-            
-            # Verificar média crítica (geralmente 0-10 ou 0-100)
-            if "media_crit" in movie and isinstance(movie["media_crit"], str):
-                try:
-                    media = float(movie["media_crit"].strip("<>"))
-                    if media < 0 or media > 100:
-                        inconsistent_data["media_crit_fora_range"] += 1
-                except:
-                    pass
-            
-            # Verificar média usuário (geralmente 0-10 ou 0-100)
-            if "media_usr" in movie and isinstance(movie["media_usr"], str):
-                try:
-                    media = float(movie["media_usr"].strip("<>"))
-                    if media < 0 or media > 100:
-                        inconsistent_data["media_usr_fora_range"] += 1
-                except:
-                    pass
-            
-            # Verificar datas inconsistentes
-            if "data de lançamento nos cinemas" in movie:
-                try:
-                    dt = datetime.strptime(movie["data de lançamento nos cinemas"], "%Y-%m-%d")
-                    current_year = datetime.now().year
-                    if dt.year > current_year:
-                        inconsistent_data["data_futura"] += 1
-                    elif dt.year < 1888:  # Primeiro filme foi em 1888
-                        inconsistent_data["data_muito_antiga"] += 1
-                except:
-                    pass
-        
-        for key, value in inconsistent_data.items():
-            report_lines.append(f"{key}: {value} ({value/total_movies*100:.2f}%)")
-        
-        # 3.2 Outliers
-        report_lines.append("")
-        report_lines.append("3.2 OUTLIERS")
-        report_lines.append("-" * 50)
-        
-        # Campos numéricos para análise de outliers
-        numeric_fields = {
-            "duracao": [],
-            "media_crit": [],
-            "media_usr": []
-        }
-        
-        for movie in self.movies_list:
-            # Duração
-            if "duracao" in movie and isinstance(movie["duracao"], str):
-                try:
-                    time_parts = movie["duracao"].split(":")
-                    if len(time_parts) == 3:
-                        hours = int(time_parts[0])
-                        minutes = int(time_parts[1])
-                        total_minutes = hours * 60 + minutes
-                        numeric_fields["duracao"].append(total_minutes)
-                except:
-                    pass
-            
-            # Média crítica
-            if "media_crit" in movie and isinstance(movie["media_crit"], str):
-                try:
-                    media = float(movie["media_crit"].strip("<>"))
-                    numeric_fields["media_crit"].append(media)
-                except:
-                    pass
-            
-            # Média usuário
-            if "media_usr" in movie and isinstance(movie["media_usr"], str):
-                try:
-                    media = float(movie["media_usr"].strip("<>"))
-                    numeric_fields["media_usr"].append(media)
-                except:
-                    pass
-        
-        outliers_data = {}
-        
-        for field, values in numeric_fields.items():
-            if not values:
-                continue
-            
-            values_arr = np.array(values)
-            
-            # Método IQR (Interquartile Range)
-            q1 = np.percentile(values_arr, 25)
-            q3 = np.percentile(values_arr, 75)
-            iqr = q3 - q1
-            lower_bound = q1 - 1.5 * iqr
-            upper_bound = q3 + 1.5 * iqr
-            
-            outliers = values_arr[(values_arr < lower_bound) | (values_arr > upper_bound)]
-            outliers_count = len(outliers)
-            outliers_percent = (outliers_count / len(values_arr)) * 100
-            
-            outliers_data[field] = {
-                "count": outliers_count,
-                "percent": outliers_percent,
-                "lower_bound": lower_bound,
-                "upper_bound": upper_bound
-            }
-            
-            report_lines.append(f"\n{field}:")
-            report_lines.append(f"  Total de valores: {len(values_arr)}")
-            report_lines.append(f"  Outliers detectados: {outliers_count} ({outliers_percent:.2f}%)")
-            report_lines.append(f"  Limite inferior: {lower_bound:.2f}")
-            report_lines.append(f"  Limite superior: {upper_bound:.2f}")
-        
-        # Visualizar outliers
-        outlier_labels = list(outliers_data.keys())
-        outlier_counts = [outliers_data[k]["count"] for k in outlier_labels]
-        
-        if outlier_labels:
-            self.plot_bar_simple(
-                labels=outlier_labels,
-                values=outlier_counts,
-                title="Quantidade de Outliers por Campo",
-                xlabel="Quantidade",
-                save_path="graphs/outliers_por_campo.png"
-            )
-        
-        # 3.3 Dados completos ou faltantes
-        report_lines.append("")
-        report_lines.append("3.3 DADOS FALTANTES")
-        report_lines.append("-" * 50)
-        
-        # Campos importantes para verificar
-        important_fields = [
-            "titulo",
-            "duracao",
-            "generos",
-            "data de lançamento nos cinemas",
-            "media_usr",
-            "cast",
-            "classificacao"
+        campos = [
+            'titulo', 'generos', 'data de lançamento', 'sinopse', 
+            'duracao', 'diretor', 'elenco', 'nota média dos criticos',
+            'nota média dos usuários', 'reviews de críticos', 'reviews de usuários'
         ]
         
-        missing_data = {}
+        completude = {}
+        for campo in campos:
+            count = 0
+            for movie in movies:
+                valor = movie.get(campo)
+                if valor is not None and valor != [] and valor != "":
+                    count += 1
+            completude[campo] = (count / len(movies)) * 100
+            print(f"{campo:30s}: {completude[campo]:5.1f}%")
         
-        for field in important_fields:
-            missing_count = 0
-            for movie in self.movies_list:
-                if field not in movie or movie[field] is None or movie[field] == "" or movie[field] == []:
-                    missing_count += 1
+        # Gráfico de Completude
+        ax1 = plt.subplot(3, 3, 1)
+        campos_curtos = [c[:15] + '...' if len(c) > 15 else c for c in campos]
+        colors = ['#2ecc71' if v >= 90 else '#f39c12' if v >= 70 else '#e74c3c' 
+                for v in completude.values()]
+        bars = ax1.barh(campos_curtos, list(completude.values()), color=colors)
+        ax1.set_xlabel('Completude (%)')
+        ax1.set_title('Completude dos Campos', fontweight='bold')
+        ax1.set_xlim(0, 100)
+        ax1.axvline(90, color='green', linestyle='--', alpha=0.3, label='90%')
+        ax1.axvline(70, color='orange', linestyle='--', alpha=0.3, label='70%')
+        
+        # 2. ANÁLISE DE VALORES INCONSISTENTES
+        print("\n2. ANÁLISE DE VALORES INCONSISTENTES")
+        print("-" * 60)
+        
+        # Analisar notas (devem estar entre 0 e 10)
+        notas_criticos_invalidas = 0
+        notas_usuarios_invalidas = 0
+        
+        for movie in movies:
+            # Nota dos críticos
+            nota_c = movie.get('nota média dos criticos')
+            if nota_c is not None and (nota_c < 0 or nota_c > 10):
+                notas_criticos_invalidas += 1
             
-            missing_percent = (missing_count / total_movies) * 100
-            missing_data[field] = {
-                "count": missing_count,
-                "percent": missing_percent
-            }
+            # Nota dos usuários
+            nota_u = movie.get('nota média dos usuários')
+            if nota_u is not None and (nota_u < 0 or nota_u > 10):
+                notas_usuarios_invalidas += 1
+        
+        print(f"Notas de críticos inválidas (fora de 0-10): {notas_criticos_invalidas}")
+        print(f"Notas de usuários inválidas (fora de 0-10): {notas_usuarios_invalidas}")
+        
+        # Analisar datas de lançamento
+        datas_invalidas = 0
+        anos = []
+        for movie in movies:
+            data = movie.get('data de lançamento')
+            if data:
+                try:
+                    dt = datetime.strptime(data, '%Y-%m-%d')
+                    ano = dt.year
+                    if ano < 1888 or ano > datetime.now().year:  # Cinema começou em 1888
+                        datas_invalidas += 1
+                    else:
+                        anos.append(ano)
+                except:
+                    datas_invalidas += 1
+        
+        print(f"Datas de lançamento inválidas: {datas_invalidas}")
+        
+        # Gráfico de Inconsistências
+        ax2 = plt.subplot(3, 3, 2)
+        inconsistencias = {
+            'Notas\nCríticos': notas_criticos_invalidas,
+            'Notas\nUsuários': notas_usuarios_invalidas,
+            'Datas': datas_invalidas
+        }
+        ax2.bar(inconsistencias.keys(), inconsistencias.values(), color='#e74c3c')
+        ax2.set_ylabel('Quantidade')
+        ax2.set_title('Valores Inconsistentes', fontweight='bold')
+        ax2.set_ylim(0, max(inconsistencias.values()) * 1.2 if max(inconsistencias.values()) > 0 else 1)
+        
+        # 3. ANÁLISE DE OUTLIERS - NOTAS
+        print("\n3. ANÁLISE DE OUTLIERS - NOTAS")
+        print("-" * 60)
+        
+        notas_criticos = [m.get('nota média dos criticos') for m in movies 
+                        if m.get('nota média dos criticos') is not None]
+        notas_usuarios = [m.get('nota média dos usuários') for m in movies 
+                        if m.get('nota média dos usuários') is not None]
+        
+        if notas_criticos:
+            q1_c = np.percentile(notas_criticos, 25)
+            q3_c = np.percentile(notas_criticos, 75)
+            iqr_c = q3_c - q1_c
+            outliers_c = [n for n in notas_criticos if n < q1_c - 1.5*iqr_c or n > q3_c + 1.5*iqr_c]
+            print(f"Outliers em notas de críticos: {len(outliers_c)} ({len(outliers_c)/len(notas_criticos)*100:.1f}%)")
+        
+        if notas_usuarios:
+            q1_u = np.percentile(notas_usuarios, 25)
+            q3_u = np.percentile(notas_usuarios, 75)
+            iqr_u = q3_u - q1_u
+            outliers_u = [n for n in notas_usuarios if n < q1_u - 1.5*iqr_u or n > q3_u + 1.5*iqr_u]
+            print(f"Outliers em notas de usuários: {len(outliers_u)} ({len(outliers_u)/len(notas_usuarios)*100:.1f}%)")
+        
+        # Boxplot de Notas
+        ax3 = plt.subplot(3, 3, 3)
+        data_box = [notas_criticos, notas_usuarios]
+        bp = ax3.boxplot(data_box, tick_labels=['Críticos', 'Usuários'], patch_artist=True)
+        for patch, color in zip(bp['boxes'], ['#3498db', '#9b59b6']):
+            patch.set_facecolor(color)
+        ax3.set_ylabel('Nota (0-10)')
+        ax3.set_title('Distribuição de Notas (Outliers)', fontweight='bold')
+        ax3.grid(True, alpha=0.3)
+        
+        # 4. ANÁLISE DE OUTLIERS - QUANTIDADE DE REVIEWS
+        print("\n4. ANÁLISE DE OUTLIERS - QUANTIDADE DE REVIEWS")
+        print("-" * 60)
+        
+        qtd_reviews_criticos = [m.get('quantidade de reviews de críticos') or 0 for m in movies]
+        qtd_reviews_usuarios = [m.get('quantidade de reviews de usuários') or 0 for m in movies]
+        
+        print(f"Reviews de críticos - Média: {np.mean(qtd_reviews_criticos):.0f}, "
+            f"Mediana: {np.median(qtd_reviews_criticos):.0f}, "
+            f"Max: {max(qtd_reviews_criticos)}")
+        print(f"Reviews de usuários - Média: {np.mean(qtd_reviews_usuarios):.0f}, "
+            f"Mediana: {np.median(qtd_reviews_usuarios):.0f}, "
+            f"Max: {max(qtd_reviews_usuarios)}")
+        
+        # Histograma de Reviews
+        ax4 = plt.subplot(3, 3, 4)
+        ax4.hist(qtd_reviews_criticos, bins=20, alpha=0.7, label='Críticos', color='#3498db')
+        ax4.set_xlabel('Quantidade de Reviews')
+        ax4.set_ylabel('Frequência')
+        ax4.set_title('Distribuição - Reviews de Críticos', fontweight='bold')
+        ax4.legend()
+        
+        ax5 = plt.subplot(3, 3, 5)
+        # Usar escala logarítmica para reviews de usuários devido à grande variação
+        if max(qtd_reviews_usuarios) > 1000:
+            ax5.hist(qtd_reviews_usuarios, bins=20, alpha=0.7, label='Usuários', color='#9b59b6')
+            ax5.set_yscale('log')
+        else:
+            ax5.hist(qtd_reviews_usuarios, bins=20, alpha=0.7, label='Usuários', color='#9b59b6')
+        ax5.set_xlabel('Quantidade de Reviews')
+        ax5.set_ylabel('Frequência')
+        ax5.set_title('Distribuição - Reviews de Usuários', fontweight='bold')
+        ax5.legend()
+        
+        # 5. ANÁLISE DE DUPLICADAS
+        print("\n5. ANÁLISE DE DUPLICATAS")
+        print("-" * 60)
+        
+        # Verificar URLs duplicadas
+        urls = [m.get('url') for m in movies if m.get('url')]
+        urls_duplicadas = [url for url, count in Counter(urls).items() if count > 1]
+        print(f"URLs duplicadas: {len(urls_duplicadas)}")
+        
+        # Verificar títulos duplicados
+        titulos = [m.get('titulo') for m in movies if m.get('titulo')]
+        titulos_duplicados = [t for t, count in Counter(titulos).items() if count > 1]
+        print(f"Títulos duplicados: {len(titulos_duplicados)}")
+        if titulos_duplicados:
+            print(f"  Títulos: {', '.join(titulos_duplicados[:5])}")
+        
+        # Gráfico de Duplicatas
+        ax6 = plt.subplot(3, 3, 6)
+        duplicatas = {
+            'URLs': len(urls_duplicadas),
+            'Títulos': len(titulos_duplicados)
+        }
+        ax6.bar(duplicatas.keys(), duplicatas.values(), color='#e67e22')
+        ax6.set_ylabel('Quantidade')
+        ax6.set_title('Registros Duplicados', fontweight='bold')
+        
+        # 6. ANÁLISE DE DURAÇÃO
+        print("\n6. ANÁLISE DE DURAÇÃO DOS FILMES")
+        print("-" * 60)
+        
+        duracoes_min = []
+        for movie in movies:
+            duracao = movie.get('duracao')
+            if duracao:
+                try:
+                    # Converter formato HH:MM:SS para minutos
+                    parts = duracao.split(':')
+                    minutos = int(parts[0]) * 60 + int(parts[1])
+                    duracoes_min.append(minutos)
+                except:
+                    pass
+        
+        if duracoes_min:
+            print(f"Duração média: {np.mean(duracoes_min):.0f} minutos")
+            print(f"Duração mediana: {np.median(duracoes_min):.0f} minutos")
+            print(f"Duração mínima: {min(duracoes_min)} minutos")
+            print(f"Duração máxima: {max(duracoes_min)} minutos")
             
-            report_lines.append(f"{field}: {missing_count} faltantes ({missing_percent:.2f}%)")
+            # Outliers de duração
+            q1_d = np.percentile(duracoes_min, 25)
+            q3_d = np.percentile(duracoes_min, 75)
+            iqr_d = q3_d - q1_d
+            outliers_d = [d for d in duracoes_min if d < q1_d - 1.5*iqr_d or d > q3_d + 1.5*iqr_d]
+            print(f"Outliers de duração: {len(outliers_d)}")
         
-        # Visualizar dados faltantes
-        missing_labels = list(missing_data.keys())
-        missing_percents = [missing_data[k]["percent"] for k in missing_labels]
+        ax7 = plt.subplot(3, 3, 7)
+        ax7.hist(duracoes_min, bins=20, color='#1abc9c', alpha=0.7)
+        ax7.axvline(np.mean(duracoes_min), color='red', linestyle='--', 
+                    label=f'Média: {np.mean(duracoes_min):.0f} min')
+        ax7.set_xlabel('Duração (minutos)')
+        ax7.set_ylabel('Frequência')
+        ax7.set_title('Distribuição de Duração', fontweight='bold')
+        ax7.legend()
         
-        self.plot_bar_simple(
-            labels=missing_labels,
-            values=missing_percents,
-            title="Percentual de Dados Faltantes por Campo",
-            xlabel="Percentual (%)",
-            save_path="graphs/dados_faltantes.png"
-        )
+        # 7. ANÁLISE DE GÊNEROS
+        print("\n7. ANÁLISE DE GÊNEROS")
+        print("-" * 60)
         
-        # 3.4 Duplicadas ou dados repetidos
-        report_lines.append("")
-        report_lines.append("3.4 DUPLICATAS")
-        report_lines.append("-" * 50)
+        todos_generos = []
+        for movie in movies:
+            generos = movie.get('generos', [])
+            todos_generos.extend(generos)
         
-        # Verificar duplicatas por título
-        titles = [movie.get("titulo", "") for movie in self.movies_list if movie.get("titulo")]
-        title_counts = Counter(titles)
-        duplicated_titles = {title: count for title, count in title_counts.items() if count > 1}
+        generos_count = Counter(todos_generos)
+        print(f"Total de gêneros únicos: {len(generos_count)}")
+        print("Top 5 gêneros mais frequentes:")
+        for genero, count in generos_count.most_common(5):
+            print(f"  {genero}: {count} filmes")
         
-        report_lines.append(f"Total de títulos únicos: {len(title_counts)}")
-        report_lines.append(f"Títulos duplicados: {len(duplicated_titles)}")
+        ax8 = plt.subplot(3, 3, 8)
+        top_generos = dict(generos_count.most_common(8))
+        ax8.barh(list(top_generos.keys()), list(top_generos.values()), color='#34495e')
+        ax8.set_xlabel('Quantidade de Filmes')
+        ax8.set_title('Gêneros Mais Frequentes', fontweight='bold')
         
-        if duplicated_titles:
-            report_lines.append("\nTítulos com duplicatas:")
-            for title, count in sorted(duplicated_titles.items(), key=lambda x: x[1], reverse=True)[:10]:
-                report_lines.append(f"  '{title}': {count} ocorrências")
+        # 8. DISTRIBUIÇÃO POR ANO
+        if anos:
+            ax9 = plt.subplot(3, 3, 9)
+            ax9.hist(anos, bins=30, color='#e74c3c', alpha=0.7)
+            ax9.set_xlabel('Ano')
+            ax9.set_ylabel('Quantidade de Filmes')
+            ax9.set_title('Distribuição por Ano de Lançamento', fontweight='bold')
+            ax9.grid(True, alpha=0.3)
         
-        # Verificar registros completamente idênticos
-        import json
-        movie_hashes = []
-        for movie in self.movies_list:
-            # Criar hash do filme (excluindo campos que podem variar)
-            movie_str = json.dumps(movie, sort_keys=True, default=str)
-            movie_hashes.append(movie_str)
+        # RESUMO FINAL
+        print("\n" + "=" * 60)
+        print("RESUMO DA QUALIDADE DOS DADOS")
+        print("=" * 60)
         
-        hash_counts = Counter(movie_hashes)
-        exact_duplicates = sum(1 for count in hash_counts.values() if count > 1)
+        total_issues = (notas_criticos_invalidas + notas_usuarios_invalidas + 
+                    datas_invalidas + len(urls_duplicadas) + len(titulos_duplicados))
         
-        report_lines.append(f"\nRegistros completamente idênticos: {exact_duplicates}")
+        completude_media = np.mean(list(completude.values()))
         
-        # Resumo geral de qualidade
-        report_lines.append("")
-        report_lines.append("="*50)
-        report_lines.append("RESUMO DE QUALIDADE")
-        report_lines.append("="*50)
+        if completude_media >= 90 and total_issues == 0:
+            qualidade = "EXCELENTE"
+            cor = "verde"
+        elif completude_media >= 75 and total_issues <= 5:
+            qualidade = "BOA"
+            cor = "amarelo"
+        else:
+            qualidade = "REQUER ATENÇÃO"
+            cor = "vermelho"
         
-        completeness_score = 100 - np.mean(missing_percents)
-        consistency_score = 100 - (sum(inconsistent_data.values()) / total_movies * 100)
-        duplicate_score = 100 - (len(duplicated_titles) / len(title_counts) * 100) if title_counts else 0
+        print(f"Qualidade Geral: {qualidade}")
+        print(f"Completude Média: {completude_media:.1f}%")
+        print(f"Total de Problemas Identificados: {total_issues}")
         
-        report_lines.append(f"Score de Completude: {completeness_score:.2f}%")
-        report_lines.append(f"Score de Consistência: {consistency_score:.2f}%")
-        report_lines.append(f"Score de Unicidade: {duplicate_score:.2f}%")
-        report_lines.append(f"Score Geral de Qualidade: {(completeness_score + consistency_score + duplicate_score) / 3:.2f}%")
-        
-        # Visualizar scores
-        score_labels = ["Completude", "Consistência", "Unicidade", "Geral"]
-        score_values = [
-            completeness_score,
-            consistency_score,
-            duplicate_score,
-            (completeness_score + consistency_score + duplicate_score) / 3
-        ]
-        
-        self.plot_bar_simple(
-            labels=score_labels,
-            values=score_values,
-            title="Scores de Qualidade dos Dados",
-            xlabel="Score (%)",
-            save_path="graphs/quality_scores.png"
-        )
-        
-        # Salvar relatório em arquivo
-        with open("quality_analysis_report.txt", "w", encoding="utf-8") as f:
-            f.write("\n".join(report_lines))
+        plt.tight_layout()
+        plt.show()
 
     def run_descriptive_analysis(self):
         # 2.1 Valores mais comuns (top gêneros, top atores???)
         genres = []
         actors = []
+        diretors = []
 
         for movie in self.movies_list:
             if movie["generos"]:
@@ -384,17 +404,26 @@ class DataAnalyzer:
                     genres.extend(g)
                 elif isinstance(g, str) and g.strip():
                     genres.append(g)
+            
+            if movie["diretor"]:
+                d = movie["diretor"]
+                if isinstance(d, list):
+                    diretors.extend(d)
+                elif isinstance(d, str) and d.strip():
+                    diretors.append(d)
 
-            if movie["cast"] and isinstance(movie["cast"], list):
-                for actor in movie["cast"]:
+            if movie["elenco"] and isinstance(movie["elenco"], list):
+                for actor in movie["elenco"]:
                     if isinstance(actor, str) and actor.strip():
                         actors.append(actor)
 
         genre_counts = Counter(genres)
         actor_counts = Counter(actors)
+        diretors_counts = Counter(diretors)
 
         top_genres = genre_counts.most_common(5)
         top_actors = actor_counts.most_common(5)
+        top_diretors = diretors_counts.most_common(5)
 
         self.plot_bar_simple(
             labels=[g for g, _ in top_genres],
@@ -412,14 +441,22 @@ class DataAnalyzer:
             save_path="graphs/top_atores.png"
         )
 
+        self.plot_bar_simple(
+            labels=[a for a, _ in top_diretors],
+            values=[c for _, c in top_diretors],
+            title="Top 10 Diretores Mais Frequentes",
+            xlabel="Contagem",
+            save_path="graphs/top_diretores.png"
+        )
+
         # 2.2 Média, mediana, moda, desvio padrão, mínimo e máximo
         # Avaliaçao geral ou por filme..? 
-        # Campos: duração, data de lançamento nos cinemas, media_crit, media_usr
+        # Campos: duração, data de lançamento, nota média dos criticos, nota média dos usuários
         fields = {
-            "duration": [],
-            "media_crit": [],
-            "media_usr": [],
-            "data de lançamento nos cinemas": []
+            "duracao": [],
+            "nota média dos criticos": [],
+            "nota média dos usuários": [],
+            "data de lançamento": []
         }
 
         for movie in self.movies_list:
@@ -427,16 +464,16 @@ class DataAnalyzer:
             if "duracao" in movie and isinstance(movie["duracao"], (int, float)):
                 fields["duracao"].append(movie["duracao"])
 
-            if "media_crit" in movie and isinstance(movie["media_crit"], (int, float)):
-                fields["media_crit"].append(movie["media_crit"])
+            if "nota média dos criticos" in movie and isinstance(movie["nota média dos criticos"], (int, float)):
+                fields["nota média dos criticos"].append(movie["nota média dos criticos"])
 
-            if "media_usr" in movie and isinstance(movie["media_usr"], (int, float)):
-                fields["media_usr"].append(movie["media_usr"])
+            if "nota média dos usuários" in movie and isinstance(movie["nota média dos usuários"], (int, float)):
+                fields["nota média dos usuários"].append(movie["nota média dos usuários"])
 
-            if "data de lançamento nos cinemas" in movie:
+            if "data de lançamento" in movie and movie["data de lançamento"] is not None:
                 try:
-                    dt = datetime.strptime(movie["data de lançamento nos cinemas"], "%Y-%m-%d")
-                    fields["data de lançamento nos cinemas"].append(dt.timestamp())
+                    dt = datetime.strptime(movie["data de lançamento"], "%Y-%m-%d")
+                    fields["data de lançamento"].append(dt.timestamp())
                 except ValueError as e:
                     print(e)
 
@@ -497,13 +534,13 @@ class DataAnalyzer:
             )
 
         # 2.4  Correlação entre atributos
-        # Correalação da avaliação (media_crit, media_usr) e a data de lançamento e duração
+        # Correalação da avaliação (nota média dos criticos, nota média dos usuários) e a data de lançamento e duração
 
         correlation_data = {
             "duracao": [],
-            "media_crit": [],
-            "media_usr": [],
-            "data de lançamento nos cinemas": []
+            "nota média dos criticos": [],
+            "nota média dos usuários": [],
+            "data de lançamento": []
         }
 
         for movie in self.movies_list:
@@ -523,19 +560,19 @@ class DataAnalyzer:
             else:
                 all_data = False
 
-            if "media_crit" in movie and isinstance(movie["media_crit"], (int, float)):
-                temp_data["media_crit"] = float(movie["media_crit"])
+            if "nota média dos criticos" in movie and isinstance(movie["nota média dos criticos"], (int, float)):
+                temp_data["nota média dos criticos"] = float(movie["nota média dos criticos"])
             else:
                 all_data = False
 
-            if "media_usr" in movie and isinstance(movie["media_usr"], (int, float)):
-                temp_data["media_usr"] = float(movie["media_usr"])
+            if "nota média dos usuários" in movie and isinstance(movie["nota média dos usuários"], (int, float)):
+                temp_data["nota média dos usuários"] = float(movie["nota média dos usuários"])
             else:
                 all_data = False
 
-            if "data de lançamento nos cinemas" in movie:
-                dt = datetime.strptime(movie["data de lançamento nos cinemas"], "%Y-%m-%d")
-                temp_data["data de lançamento nos cinemas"] = dt.year
+            if "data de lançamento" in movie and movie["data de lançamento"] is not None:
+                dt = datetime.strptime(movie["data de lançamento"], "%Y-%m-%d")
+                temp_data["data de lançamento"] = dt.year
             else:
                 all_data = False
 
@@ -560,41 +597,41 @@ class DataAnalyzer:
             # Media crítica vs duração
             self.plot_scatter(
                 x=correlation_data["duracao"],
-                y=correlation_data["media_crit"],
+                y=correlation_data["nota média dos criticos"],
                 title="Correlação: Duração vs Média Crítica",
                 xlabel="Duração (min)",
                 ylabel="Média Crítica",
-                save_path="graphs/scatter_duracao_media_crit.png"
+                save_path="graphs/scatter_duracao_nota_media_dos_criticos.png"
             )
 
             # Media usuário vs duração
             self.plot_scatter(
                 x=correlation_data["duracao"],
-                y=correlation_data["media_usr"],
+                y=correlation_data["nota média dos usuários"],
                 title="Correlação: Duração vs Média Usuário",
                 xlabel="Duração (min)",
                 ylabel="Média Usuário",
-                save_path="graphs/scatter_duracao_media_usr.png"
+                save_path="graphs/scatter_duracao_nota_media_dos_media_usuarios.png"
             )
 
             # Media crítica vs ano de lançamento
             self.plot_scatter(
-                x=correlation_data["data de lançamento nos cinemas"],
-                y=correlation_data["media_crit"],
+                x=correlation_data["data de lançamento"],
+                y=correlation_data["nota média dos criticos"],
                 title="Correlação: Ano de Lançamento vs Média Crítica",
                 xlabel="Ano de Lançamento",
                 ylabel="Média Crítica",
-                save_path="graphs/scatter_ano_media_crit.png"
+                save_path="graphs/scatter_ano_nota_media_dos_criticos.png"
             )
 
             # Media usuário vs ano de lançamento
             self.plot_scatter(
-                x=correlation_data["data de lançamento nos cinemas"],
-                y=correlation_data["media_usr"],
+                x=correlation_data["data de lançamento"],
+                y=correlation_data["nota média dos usuários"],
                 title="Correlação: Ano de Lançamento vs Média Usuário",
                 xlabel="Ano de Lançamento",
                 ylabel="Média Usuário",
-                save_path="graphs/scatter_ano_media_usr.png"
+                save_path="graphs/scatter_ano_nota_media_dos_media_usuarios.png"
             )
 
 
@@ -681,7 +718,7 @@ class DataAnalyzer:
     def run_all(self):
         self.run_structure_anaysis()
         self.run_descriptive_analysis()
-        self.run_quality_analysis()
+        self.run_quality_analysis(self.movies_list)
 
 if __name__ == "__main__":
     with open("filmes.json", "r", encoding="utf-8") as file:
