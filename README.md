@@ -1,6 +1,6 @@
 # INE5454-gerencia-de-dados
 
-Para executar o código desenvolvido, prepare o ambiente:
+Para executar o código desenvolvido do crawler, prepare o ambiente:
 
 ```
 python3 -m venv venv
@@ -20,3 +20,4 @@ E uma dessas opções
 sudo playwright install-deps
 sudo apt-get install libavif16
 ```
+Para executar a aplicação desenvolvida que utiliza os dados extraídos pelo crawler, veja o README disponível no diretório destinado a aplicação.
