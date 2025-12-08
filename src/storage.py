@@ -83,66 +83,85 @@ class Storage(Observed):
                         ]
                     }
                     data["filmes"].append(movie_dict)
-
-            # processed_movies: list[Movie] = []
-            
-            # first = True
-            # for outer_type_key, unprocessed_movies in self.scrapers.items():
-            #     if first:
-            #         for unprocessed_movie in unprocessed_movies:
-            #             processed_movies.append(unprocessed_movie)
-            #         first = False
-            #     else:
-            #         for unprocessed_movie in unprocessed_movies:
-            #             for processed_movie in processed_movies:
-            #                 if processed_movie == unprocessed_movie:  # Overloaded operator for similarity comparation
-            #                     movie = processed_movie.unite(unprocessed_movie)
-            #                     processed_movies.append(movie)
-            
-            # for movie in processed_movies:
-            #     # Monta o dicionário do filme
-            #     movie_dict = {
-            #         "url": movie.get_url(),
-            #         "titulo": movie.get_title(),
-            #         "generos": movie.get_genres(),
-            #         "data de lançamento nos cinemas": movie.get_release_date(),
-            #         "data de lançamento em streaming": movie.get_release_date_streaming(),
-            #         "classificacao indicativa": movie.get_content_rating(),
-            #         "sinopse": movie.get_synopsis(),
-            #         "duracao": movie.get_length(),
-            #         "diretor": ", ".join(movie.get_directors()),
-            #         "cast": movie.get_cast(),
-            #         "media_crit": movie.get_crit_avr_rating(),
-            #         "reviews_crit": [
-            #             {
-            #                 "avaliacao": r.get_rating(),
-            #                 "texto": r.get_text(),
-            #                 "data": r.get_date()
-            #             } for r in movie.get_crit_reviews()
-            #         ],
-            #         "media_usr": movie.get_usr_avr_rating(),
-            #         "reviews_usr": [
-            #             {
-            #                 "avaliacao": r.get_rating(),
-            #                 "texto": r.get_text(),
-            #                 "data": r.get_date()
-            #             } for r in movie.get_usr_reviews()
-            #         ],
-            #         "plataforms": [
-            #             {
-            #                 "plat_name": p.plataform,
-            #                 "url": p.link
-            #             } for p in movie.get_platforms()
-            #         ]
-            #     }
-
-            #     data["filmes"].append(movie_dict)
-
-            # Define o caminho do arquivo JSON
-            output_path = Path("filmes.json")
+                    
+            output_path = Path("movies.json")
 
             # Salva no arquivo com indentação para melhor leitura
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
+
+
+            print(f"Arquivo salvo em: {output_path.resolve()}")
+            
+            first = True
+            processed_movies: list[Movie] = []
+            
+            for outer_type_key, unprocessed_movies in self.scrapers.items():
+                if first:
+                    for unprocessed_movie in unprocessed_movies:
+                        processed_movies.append(unprocessed_movie)
+                    first = False
+                else:
+                    new_movies = []
+                    for unprocessed_movie in unprocessed_movies:
+                        equal = False
+                        for processed_movie in processed_movies:
+                            if processed_movie == unprocessed_movie:  # Overloaded operator for similarity comparation
+                                movie = processed_movie.unite(unprocessed_movie)
+                                equal = True
+                                break
+                        if not equal:
+                            new_movies.append(unprocessed_movie)
+                    processed_movies.extend(new_movies)
+
+            data_united = {"filmes": []}        
+
+            for movie in processed_movies:
+                # Monta o dicionário do filme
+                movie_dict = {
+                    "url": movie.get_url(),
+                    "titulo": movie.get_title(),
+                    "generos": movie.get_genres(),
+                    "data de lançamento": movie.get_release_date(),
+                    "classificacao indicativa": movie.get_content_rating(),
+                    "sinopse": movie.get_synopsis(),
+                    "duracao": movie.get_length(),
+                    "diretor": movie.get_directors(),
+                    "elenco": movie.get_cast(),
+                    "onde assistir": [
+                        {
+                            "plataforma": p.get_plataform(),
+                            "link": p.get_link()
+                        } for p in movie.get_platforms()
+                    ],
+                    "link do poster": movie.get_poster_link(),
+                    "nota média dos criticos": movie.get_crit_avr_rating(),
+                    "taxa de recomendação dos críticos": movie.get_crit_avr_recommendation(),
+                    "quantidade de reviews de críticos": movie.get_crit_reviews_count(),
+                    "reviews de críticos": [
+                        {
+                            "avaliação (nota até 10)": r.get_rating(),
+                            "texto": r.get_text(),
+                            "data": r.get_date()
+                        } for r in movie.get_crit_reviews()
+                    ],
+                    "nota média dos usuários": movie.get_usr_avr_rating(),
+                    "taxa de recomendação dos usuários": movie.get_usr_avr_recommendation(),
+                    "quantidade de reviews de usuários": movie.get_usr_reviews_count(),
+                    "reviews de usuários": [
+                        {
+                            "avaliação (nota até 10)": r.get_rating(),
+                            "texto": r.get_text(),
+                            "data": r.get_date()
+                        } for r in movie.get_usr_reviews()
+                    ]
+                }
+                data_united["filmes"].append(movie_dict)
+
+            output_path = Path("movies_united.json")
+
+            # Salva no arquivo com indentação para melhor leitura
+            with open(output_path, "w", encoding="utf-8") as f:
+                json.dump(data_united, f, ensure_ascii=False, indent=4)
 
             print(f"Arquivo salvo em: {output_path.resolve()}")

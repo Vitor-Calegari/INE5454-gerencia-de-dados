@@ -49,9 +49,11 @@ class RottScraper(Scraper):
                 try:
                     title = (data.get("name")).strip()
                     if not title:
+                        self._errors += 1
                         return 1
                     movie.set_title(str(title))
                 except Exception:
+                    self._errors += 1
                     return 1
                 
                 try:
@@ -82,6 +84,7 @@ class RottScraper(Scraper):
                     print(f"[ERROR] Falha ao obter a classificação indicativa na URL {url_str}. Erro: {e}")
                 return 0
             else:
+                self._errors += 1
                 return 1
         except Exception as e:
             self._errors += 1
@@ -129,10 +132,12 @@ class RottScraper(Scraper):
                             try:
                                 val = wrap.find(attrs={"data-qa": "item-value"})
                                 if val:
-                                    length = val.text.strip()
-                                    pd_length = pd.to_timedelta(length)
-                                    length_formatted = str(pd_length).split()[-1]
-                                    movie.set_length(length_formatted)
+                                    length = val.text
+                                    if length:
+                                        length = length.strip()
+                                        pd_length = pd.to_timedelta(length)
+                                        length_formatted = str(pd_length).split()[-1]
+                                        movie.set_length(length_formatted)
                             except Exception as e:
                                 self._errors += 1
                                 print(f"[ERROR] Falha ao processar a duração do filme na URL {url_str}. Erro: {e}")
@@ -160,19 +165,21 @@ class RottScraper(Scraper):
             if script_tag:
 
                 raw_json = script_tag.string.strip()
-                data = json.loads(raw_json)
-                actor_data = data.get("actor")
-                if actor_data:
-                    for person in actor_data:
-                        try:
-                            name = person.get("name")
-                            if name:
-                                name = name.strip()
-                                if name:
-                                    movie.add_cast_member(name)
-                        except Exception as e:
-                            self._errors += 1
-                            print(f"[ERROR] Falha ao processar ator no link {url_cast}. Erro: {e}")
+                if raw_json:
+                    data = json.loads(raw_json)
+                    if data:
+                        actor_data = data.get("actor")
+                        if actor_data:
+                            for person in actor_data:
+                                try:
+                                    name = person.get("name")
+                                    if name:
+                                        name = name.strip()
+                                        if name:
+                                            movie.add_cast_member(name)
+                                except Exception as e:
+                                    self._errors += 1
+                                    print(f"[ERROR] Falha ao processar ator no link {url_cast}. Erro: {e}")
         except Exception as e:
             self._errors += 1
             print(f"[ERROR] Falha ao obter ou processar o cast na URL {url_cast}. Erro: {e}")
@@ -192,44 +199,50 @@ class RottScraper(Scraper):
 
                     if aud:
                         try:
-                            aud_review_count = int(aud["reviewCount"])
-                            movie.set_usr_rev_count(aud_review_count)
+                            if aud["reviewCount"]:
+                                aud_review_count = int(aud["reviewCount"])
+                                movie.set_usr_rev_count(aud_review_count)
                         except Exception as e:
                             self._errors += 1
                             print(f"[ERROR] Falha ao processar review de usuário (quantidade) na URL {url_str}. Erro: {e}")
 
                         try:
-                            aud_score_percent = int(aud["scorePercent"].replace("%", ""))
-                            movie.set_usr_avr_recommendation(aud_score_percent)
+                            if aud["scorePercent"]:
+                                aud_score_percent = int(aud["scorePercent"].replace("%", ""))
+                                movie.set_usr_avr_recommendation(aud_score_percent)
                         except Exception as e:
                             self._errors += 1
                             print(f"[ERROR] Falha ao processar review de usuário (percentual de recomendação) na URL {url_str}. Erro: {e}")
 
                         try:
-                            aud_avg_rating = float(aud["averageRating"])*2   # *2 pra transformar nota até 5 em até 10
-                            movie.set_usr_avr_rating(aud_avg_rating)
+                            if aud["averageRating"]:
+                                aud_avg_rating = float(aud["averageRating"])*2   # *2 pra transformar nota até 5 em até 10
+                                movie.set_usr_avr_rating(aud_avg_rating)
                         except Exception as e:
                             self._errors += 1
                             print(f"[ERROR] Falha ao processar review de usuário (nota média) na URL {url_str}. Erro: {e}")
 
                     if crit:
                         try:
-                            crit_review_count = int(crit["reviewCount"])
-                            movie.set_crit_rev_count(crit_review_count)
+                            if crit["reviewCount"]:
+                                crit_review_count = int(crit["reviewCount"])
+                                movie.set_crit_rev_count(crit_review_count)
                         except Exception as e:
                             self._errors += 1
                             print(f"[ERROR] Falha ao processar review de crítico (quantidade) na URL {url_str}. Erro: {e}")
 
                         try:
-                            crit_score_percent = int(crit["scorePercent"].replace("%", ""))
-                            movie.set_crit_avr_recommendation(crit_score_percent)
+                            if crit["scorePercent"]:
+                                crit_score_percent = int(crit["scorePercent"].replace("%", ""))
+                                movie.set_crit_avr_recommendation(crit_score_percent)
                         except Exception as e:
                             self._errors += 1
                             print(f"[ERROR] Falha ao processar review de crítico (percentual de recomendação) na URL {url_str}. Erro: {e}")
 
                         try:
-                            crit_avg_rating = float(crit["averageRating"])
-                            movie.set_crit_avr_rating(crit_avg_rating)
+                            if crit["averageRating"]:
+                                crit_avg_rating = float(crit["averageRating"])
+                                movie.set_crit_avr_rating(crit_avg_rating)
                         except Exception as e:
                             self._errors += 1
                             print(f"[ERROR] Falha ao processar review de crítico (nota média) na URL {url_str}. Erro: {e}")
@@ -273,7 +286,6 @@ class RottScraper(Scraper):
             dt = now - pd.Timedelta(weeks=weeks)
             return dt.strftime("%Y-%m-%d")
 
-
         # datas
         try:
             # Se não tem ano, adiciona o ano atual
@@ -290,137 +302,118 @@ class RottScraper(Scraper):
             self._errors += 1
             print(f"[ERROR] Falha ao processar data de uma reviews na URL {url_rev} no Playright. Erro: {e}")
         
-    def scrapUsrReviews(self, movie: Movie, url: str):
+    def scrapUsrReviews(self, page, movie: Movie, url: str):
         url_rev = f"{url}/reviews/all-audience"
 
         try:
-            with sync_playwright() as p:
+            page.goto(url_rev, wait_until="domcontentloaded")
+            page.wait_for_selector("review-card", timeout=10000)
 
-                browser = p.chromium.launch(headless=True)
-                page = browser.new_page()
-
+            cards = page.locator("review-card")
+            count = cards.count()
+            for i in range(count):
                 try:
-                    page.goto(url_rev, wait_until="domcontentloaded")
-                    page.wait_for_selector("review-card", timeout=10000)
+                    card = cards.nth(i)
 
-                    cards = page.locator("review-card")
-                    count = cards.count()
-                    for i in range(count):
-                        try:
-                            card = cards.nth(i)
-
-                            # Texto do review
-                            loc = card.locator("drawer-more >> [slot='review'], span[slot='content']")
-                            if loc.count() > 0:
-                                texto = loc.inner_text(timeout=2000).strip()
-                            else:
-                                texto = None
-                           
-                            # Nota
-                            score_el = card.locator("rating-stars-group")
-                            nota = None
-                            if score_el.count() > 0:
-                                score = score_el.get_attribute("score")
-                                nota = float(score) * 2 if score else None
-                           
-                            # Data 
-                            data_el = card.locator("span[slot='timestamp']")
-                            date_raw = data_el.inner_text() if data_el.count() > 0 else None
-                            date_formatted = self.parse_rotten_date(date_raw, url_rev)
-                         
-                            if (texto or nota):
-                                review = Review()
-                                review.set_text(texto)
-                                review.set_rating(nota)
-                                review.set_date(date_formatted)
-                                movie.add_user_review(review)
-                            
-                        except Exception as e:
-                            self._errors += 1
-                            print(f"[ERROR] Falha ao processar uma review na URL {url_rev} no Playright. Erro: {e}")
+                    # Texto do review
+                    loc = card.locator("drawer-more >> [slot='review'], span[slot='content']")
+                    if loc.count() > 0:
+                        texto = loc.inner_text(timeout=2000).strip()
+                    else:
+                        texto = None
+                    
+                    # Nota
+                    score_el = card.locator("rating-stars-group")
+                    nota = None
+                    if score_el.count() > 0:
+                        score = score_el.get_attribute("score")
+                        nota = float(score) * 2 if score else None
+                    
+                    # Data 
+                    data_el = card.locator("span[slot='timestamp']")
+                    date_raw = data_el.inner_text() if data_el.count() > 0 else None
+                    date_formatted = self.parse_rotten_date(date_raw, url_rev)
+                    
+                    if (texto or nota):
+                        review = Review()
+                        review.set_text(texto)
+                        review.set_rating(nota)
+                        review.set_date(date_formatted)
+                        movie.add_user_review(review)
+                    
                 except Exception as e:
                     self._errors += 1
-                    print(f"[ERROR] Falha ao processar URL {url_rev} no Playright. Erro: {e}")
-                finally:
-                    browser.close()
+                    print(f"[ERROR] Falha ao processar uma review na URL {url_rev} no Playright. Erro: {e}")
         except Exception as e:
             self._errors += 1
-            print(f"[ERROR] Falha ao iniciar Playright ou navegador para URL {url_rev}. Erro: {e}")
+            print(f"[ERROR] Falha ao processar URL {url_rev} no Playright. Erro: {e}")
 
-    def scrapCritReviews(self, movie: Movie, url: str):
+
+    def scrapCritReviews(self, page, movie: Movie, url: str):
         url_rev = f"{url}/reviews/all-critics"
 
+
         try:
-            with sync_playwright() as p:
+            page.goto(url_rev, wait_until="domcontentloaded")
+            page.wait_for_selector("review-card", timeout=10000)
 
-                browser = p.chromium.launch(headless=True)
-                page = browser.new_page()
-
+            cards = page.locator("review-card")
+            count = cards.count()
+            for i in range(count):
                 try:
-                    page.goto(url_rev, wait_until="domcontentloaded")
-                    page.wait_for_selector("review-card", timeout=10000)
+                    card = cards.nth(i)
 
-                    cards = page.locator("review-card")
-                    count = cards.count()
-                    for i in range(count):
-                        try:
-                            card = cards.nth(i)
+                    # Texto do review
+                    loc = card.locator("drawer-more >> [slot='review'], span[slot='content']")
+                    if loc.count() > 0:
+                        texto = loc.inner_text(timeout=2000).strip()
+                    else:
+                        texto = None
+                    # Nota
+                    rating_span = card.locator("span[slot='rating'] > span")
+                    raw = rating_span.inner_text(timeout=1000).strip() if rating_span.count() > 0 else None
+                    if raw:
+                        # 1) IGNORAR notas em letra
+                        if re.match(r"^[A-F][+-]?$", raw):
+                            nota = None
 
-                            # Texto do review
-                            loc = card.locator("drawer-more >> [slot='review'], span[slot='content']")
-                            if loc.count() > 0:
-                                texto = loc.inner_text(timeout=2000).strip()
-                            else:
-                                texto = None
-                            # Nota
-                            rating_span = card.locator("span[slot='rating'] > span")
-                            raw = rating_span.inner_text(timeout=1000).strip() if rating_span.count() > 0 else None
-                            if raw:
-                                # 1) IGNORAR notas em letra
-                                if re.match(r"^[A-F][+-]?$", raw):
-                                    nota = None
-
-                                # 2) Frações (3/4, 9/10 etc.)
-                                elif "/" in raw and re.match(r"^\d+(\.\d+)?/\d+(\.\d+)?$", raw):
-                                    num, den = raw.split("/")
-                                    num = float(num)
-                                    den = float(den)
-                                    if den == 0:
-                                        nota = None
-                                    nota = round((num / den) * 10, 2)
-
-                                # 3) Número direto (0–10)
-                                elif re.match(r"^\d+(\.\d+)?$", raw):
-                                    value = float(raw)
-                                    if value <= 10:
-                                        nota = value
-                                    else:
-                                    # caso improvável (nota tipo 80/100 sem barra)
-                                        nota = round((value / 100) * 10, 2)
-                            else:
+                        # 2) Frações (3/4, 9/10 etc.)
+                        elif "/" in raw and re.match(r"^\d+(\.\d+)?/\d+(\.\d+)?$", raw):
+                            num, den = raw.split("/")
+                            num = float(num)
+                            den = float(den)
+                            if den == 0:
                                 nota = None
-                            # Data 
-                            data_el = card.locator("span[slot='timestamp']")
-                            date_raw = data_el.inner_text() if data_el.count() > 0 else None
-                            date_formatted = self.parse_rotten_date(date_raw, url_rev)
-                            if (texto or nota):
-                                review = Review()
-                                review.set_text(texto)
-                                review.set_rating(nota)
-                                review.set_date(date_formatted)
-                                movie.add_critic_review(review)
-                            
-                        except Exception as e:
-                            self._errors += 1
-                            print(f"[ERROR] Falha ao processar uma review na URL {url_rev} no Playright. Erro: {e}")
+                            nota = round((num / den) * 10, 2)
+
+                        # 3) Número direto (0–10)
+                        elif re.match(r"^\d+(\.\d+)?$", raw):
+                            value = float(raw)
+                            if value <= 10:
+                                nota = value
+                            else:
+                            # caso improvável (nota tipo 80/100 sem barra)
+                                nota = round((value / 100) * 10, 2)
+                    else:
+                        nota = None
+                    # Data 
+                    data_el = card.locator("span[slot='timestamp']")
+                    date_raw = data_el.inner_text() if data_el.count() > 0 else None
+                    date_formatted = self.parse_rotten_date(date_raw, url_rev)
+                    if (texto or nota):
+                        review = Review()
+                        review.set_text(texto)
+                        review.set_rating(nota)
+                        review.set_date(date_formatted)
+                        movie.add_critic_review(review)
+                    
                 except Exception as e:
                     self._errors += 1
-                    print(f"[ERROR] Falha ao processar URL {url_rev} no Playright. Erro: {e}")
-                finally:
-                    browser.close()
+                    print(f"[ERROR] Falha ao processar uma review na URL {url_rev} no Playright. Erro: {e}")
         except Exception as e:
             self._errors += 1
-            print(f"[ERROR] Falha ao iniciar Playright ou navegador para URL {url_rev}. Erro: {e}")
+            print(f"[ERROR] Falha ao processar URL {url_rev} no Playright. Erro: {e}")
+
 
     def scrapNewMovies(self, site: BeautifulSoup, url_str: str):
         try:
@@ -474,73 +467,83 @@ class RottScraper(Scraper):
             print(f"[ERROR] Falha ao normalizar a plataforma a partir do link {link}. Erro: {e}")
             return None
     
-    def scrapDynamicData(self, url: URL, movie: Movie):
+    def scrapPlataforms(self, page, movie: Movie, url: str):
         try:
-            options = Options()
-            options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/120.0.0.0 Safari/537.36")
-            options.add_argument("--headless")  # roda sem abrir janela
-            options.add_argument("--no-sandbox")
-            options.add_argument("--disable-dev-shm-usage")
-            options.page_load_strategy = 'eager'
-            service = Service()
-            service.startup_timeout = 10
-            driver = webdriver.Chrome(service=service, options=options)
-            driver.set_page_load_timeout(20) 
-        except TimeoutException as e:
-            self._errors += 1
-            print(f"[TIMEOUT] ChromeDriver excedeu o tempo limite ao inicializar. URL: {url.get_url()}. Erro: {e}")
-            return
-        except Exception as e:
-            self._errors += 1
-            print(f"[ERROR] Falha ao iniciar ChromeDriver para URL {url.get_url()}. Pulando coleta de plataformas de streaming. Erro: {e}")
-            return
-        
-        try:
-            driver.get(url.get_url())
-            time.sleep(3)
+            page.goto(url, wait_until="domcontentloaded")
+            
+            iframe_locator = page.locator(
+                "div[data-wheretowatchmanager='jwContainer'] >> iframe.jw-widget-iframe"
+            )
             try:
-                iframe = driver.find_element(
-                    By.XPATH, "//div[@data-wheretowatchmanager='jwContainer']//iframe[contains(@class, 'jw-widget-iframe')]"
-                )
-            except NoSuchElementException:
-                self._errors += 1
-                print(f"[TIMEOUT] Iframe não encontrado em {url.get_url()}")
-                iframe = None
-    
-        
-            if iframe:
-                # muda o contexto para dentro do iframe
-                driver.switch_to.frame(iframe)
-                time.sleep(3)
-                try:
-                    offers = driver.find_elements(By.XPATH, "//div[contains(@class,'jw-offer')]/a")
-                except NoSuchElementException:
-                    self._errors += 1
-                    print(f"[ERROR] Nenhuma plataforma encontrada no iframe para: {url.get_url()}")
-                    offers = []
+                iframe_locator.wait_for(timeout=5000)
+            except Exception:
+                # não existe para esse filme
+                return
+            
+            iframe_element = iframe_locator.element_handle()
+            if iframe_element:
+                frame = iframe_element.content_frame()
                 
-                if offers:
+                if frame:
+                    try:
+                        frame.wait_for_selector("div.jw-offer a", timeout=5000)
+                        offers = frame.locator("div.jw-offer a")
+                    except Exception:
+                        # nao existe para esse filme
+                        return
+
+                    count = offers.count()
                     plataform_names = []
-                    for offer in offers:
-                        link = offer.get_attribute("href")
-                        plataform_name = self.normalize_platform_from_url(link)
+                    for i in range(count):
+                        try:
+                            offer = offers.nth(i)
+                            link = offer.get_attribute("href")
 
-                        if plataform_name and plataform_name not in plataform_names:
-                            plataform_names.append(plataform_name)
-                            plataform = Plataform(plataform_name, link)
-                            movie.add_platform(plataform)
+                            plataform_name = self.normalize_platform_from_url(link)
 
-        except WebDriverException as e:
-            self._errors += 1
-            print(f"[ERROR] Ocorreu um erro no WebDriver para a URL {url.get_url()}. Erro: {e}")
+                            if plataform_name and plataform_name not in plataform_names:
+                                plataform_names.append(plataform_name)
+                                plataform = Plataform(plataform_name, link)
+                                movie.add_platform(plataform)
+
+                        except Exception as e:
+                            self._errors += 1
+                            print(f"[ERROR] Falha ao ler plataforma em {url}. Erro: {e}")
+            
         except Exception as e:
             self._errors += 1
-            print(f"[ERROR] Falha ao coletar dados dinâmicos da URL {url.get_url()}. Erro: {e}")
-        finally:
-            # sai do iframe e encerra
-            driver.quit()
+            print(f"[ERROR] Falha ao processar URL {url} no Playright. Erro: {e}")
+        
+    def scrapDynamicData(self, url: URL, movie: Movie):
+        url_str = url.get_url()
+        try:
+            browser = None
+            with sync_playwright() as p:
+                try:
+                    browser = p.chromium.launch(headless=True)
+                    context = browser.new_context(extra_http_headers=self.headers)
+                    page = context.new_page()
+                
+                    t0 = time.time()
+                    self.scrapCritReviews(page, movie, url_str)
+                    self.end_phase("Reviews de críticos", t0)
+                    
+                    t0 = time.time()
+                    self.scrapUsrReviews(page, movie, url_str)
+                    self.end_phase("Reviews de usuários", t0)
+                    
+                    t0 = time.time()
+                    self.scrapPlataforms(page, movie, url_str)
+                    self.end_phase("Plataformas", t0)
+                except Exception as e:
+                    print(f"[ERROR] Falha durante a coleta dinâmica no Rotten Tomatoes. Erro: {e}")
+                    self._errors += 1
+                finally:
+                    if browser:
+                        browser.close()
+        except Exception as e:
+            self._errors += 1
+            print(f"[ERROR] Falha ao iniciar Playright ou navegador no Rotten Tomatoes scraper. Erro: {e}")
 
     @override
     def scrap(self):
@@ -590,17 +593,7 @@ class RottScraper(Scraper):
             self.scrapRevData(site, movie)
             self.end_phase("Dados sobre reviews", t0)
             
-            t0 = time.time()
-            self.scrapUsrReviews(movie, url_str)
-            self.end_phase("Reviews de usuários", t0)
-            
-            t0 = time.time()
-            self.scrapCritReviews(movie, url_str)
-            self.end_phase("Reviews de críticos", t0)
-            
-            t0 = time.time()
             self.scrapDynamicData(url, movie)
-            self.end_phase("Plataformas", t0)
             
             t0 = time.time()
             self.scrapNewMovies(site, url_str)

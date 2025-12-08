@@ -64,24 +64,28 @@ class IMDBScraper(Scraper):
                         return 1
                     movie.set_title(str(title))
                 except Exception:
-                    self._errors += 1
                     return 1
                 
                 try:
-                    movie.set_genres([g.strip() for g in data.get("genre", [])])
+                    genres = data.get("genre", [])
+                    if genres:
+                        movie.set_genres([g.strip() for g in genres])
                 except Exception as e:
                     self._errors += 1
                     print(f"[ERROR] Falha ao obter os gêneros na URL {url_str}. Erro: {e}")
 
-
                 try:
-                    movie.set_release_date(data.get("datePublished").strip())
+                    date = data.get("datePublished")
+                    if date:
+                        movie.set_release_date(date.strip())
                 except Exception as e:
                     self._errors += 1
                     print(f"[ERROR] Falha ao obter data de lançamento na URL {url_str}. Erro: {e}")
 
                 try:
-                    movie.set_synopsis((data.get("description")).strip())
+                    synopsis = data.get("description")
+                    if synopsis:
+                        movie.set_synopsis(synopsis.strip())
                 except Exception as e:
                     self._errors += 1
                     print(f"[ERROR] Falha ao obter sinopse na URL {url_str}. Erro: {e}")
@@ -98,32 +102,36 @@ class IMDBScraper(Scraper):
 
                 # Extracting content rating
                 try:
-                    movie.set_content_rating((data.get("contentRating")).strip())
+                    contentrating = data.get("contentRating")
+                    if contentrating:
+                        movie.set_content_rating(contentrating.strip())
                 except Exception as e:
                     self._errors += 1
                     print(f"[ERROR] Falha ao obter a classificação indicativa na URL {url_str}. Erro: {e}")
 
                 # Extracting user ratings
                 aggregate_rating = data.get("aggregateRating", {})
-                try:
-                    ratingValue = aggregate_rating.get("ratingValue")
-                    movie.set_usr_avr_rating(float(ratingValue))
-                except Exception as e:
-                    self._errors += 1
-                    print(f"[ERROR] Falha ao obter nota média de reviews usuários na URL {url_str}. Erro: {e}")
+                if aggregate_rating:
+                    try:
+                        ratingValue = aggregate_rating.get("ratingValue")
+                        if ratingValue:
+                            movie.set_usr_avr_rating(float(ratingValue))
+                    except Exception as e:
+                        self._errors += 1
+                        print(f"[ERROR] Falha ao obter nota média de reviews usuários na URL {url_str}. Erro: {e}")
 
-                try:
-                    ratingCount = aggregate_rating.get("ratingCount")
-                    movie.set_usr_rev_count(int(ratingCount))
-                except Exception as e:
-                    self._errors += 1
-                    print(f"[ERROR] Falha ao obter quantidade de reviews de usuários na URL {url_str}. Erro: {e}")
+                    try:
+                        ratingCount = aggregate_rating.get("ratingCount")
+                        if ratingCount:
+                            movie.set_usr_rev_count(int(ratingCount))
+                    except Exception as e:
+                        self._errors += 1
+                        print(f"[ERROR] Falha ao obter quantidade de reviews de usuários na URL {url_str}. Erro: {e}")
                 
                 return 0
             else:
                 return 1
         except Exception as e:
-            self._errors += 1
             print(f"[ERROR] Falha ao obter JSON-LD da URL {url_str}. Erro: {e}")
             return 1
 
@@ -143,7 +151,8 @@ class IMDBScraper(Scraper):
         try:
             # Encontra o bloco onde o rótulo é "Directors"
             directors_section = site.find("span", string="Directors")
-
+            if not directors_section:
+                directors_section = site.find("span", string="Director")
             if directors_section:
                 # Pega o container logo após o span
                 container = directors_section.find_next(
@@ -182,40 +191,41 @@ class IMDBScraper(Scraper):
         
         try:
             reviews_site = BeautifulSoup(resp.text, "html.parser")
-            # encontra todos os containers de reviews
-            review_divs = reviews_site.find_all("article")
-            if not review_divs:
-                # talvez a nova classe
-                review_divs = reviews_site.find_all(
-                    "div", class_="lister-item mode-detail imdb-user-review"
-                )
-            
-            if review_divs:
-                for div in review_divs:
-                    try:
-                        rating = None
-                        # extrai a nota
-                        rating_span = div.find("span", class_="ipc-rating-star--rating")
-                        if rating_span:
-                            rating = float(rating_span.get_text(strip=True))
+            if reviews_site:
+                # encontra todos os containers de reviews
+                review_divs = reviews_site.find_all("article")
+                if not review_divs:
+                    # talvez a nova classe
+                    review_divs = reviews_site.find_all(
+                        "div", class_="lister-item mode-detail imdb-user-review"
+                    )
+                
+                if review_divs:
+                    for div in review_divs:
+                        try:
+                            rating = None
+                            # extrai a nota
+                            rating_span = div.find("span", class_="ipc-rating-star--rating")
+                            if rating_span:
+                                rating = float(rating_span.get_text(strip=True))
 
-                        # extrai o texto do review
-                        text_div = div.find("div", class_="ipc-html-content-inner-div")
-                        comment = text_div.get_text(strip=True) if text_div else None
+                            # extrai o texto do review
+                            text_div = div.find("div", class_="ipc-html-content-inner-div")
+                            comment = text_div.get_text(strip=True) if text_div else None
 
-                        # data da review
-                        date_span = div.find("li", class_="ipc-inline-list__item review-date")
-                        date = date_span.get_text(strip=True) if date_span else None
-                        datetime = pd.to_datetime(date, format="%b %d, %Y") if date else None
-                        data_formatada = (datetime.strftime("%Y-%m-%d")).strip() if datetime else None
-                        usr_review = Review()
-                        usr_review.set_date(data_formatada)
-                        usr_review.set_rating(rating)
-                        usr_review.set_text(comment)
-                        movie.add_user_review(usr_review)
-                    except Exception as e:
-                        self._errors += 1
-                        print(f"[ERROR] Falha ao processar uma review de usuário na URL {usr_review_url}. Erro: {e}")
+                            # data da review
+                            date_span = div.find("li", class_="ipc-inline-list__item review-date")
+                            date = date_span.get_text(strip=True) if date_span else None
+                            datetime = pd.to_datetime(date, format="%b %d, %Y") if date else None
+                            data_formatada = (datetime.strftime("%Y-%m-%d")).strip() if datetime else None
+                            usr_review = Review()
+                            usr_review.set_date(data_formatada)
+                            usr_review.set_rating(rating)
+                            usr_review.set_text(comment)
+                            movie.add_user_review(usr_review)
+                        except Exception as e:
+                            self._errors += 1
+                            print(f"[ERROR] Falha ao processar uma review de usuário na URL {usr_review_url}. Erro: {e}")
         except Exception as e:
             self._errors += 1
             print(f"[ERROR] Falha ao obter ou processar reviews de usuários na URL {usr_review_url}. Erro: {e}")
@@ -232,46 +242,69 @@ class IMDBScraper(Scraper):
             return
         try:
             reviews_site = BeautifulSoup(resp.text, "html.parser")
+            if reviews_site:
 
-            try:
-                metascore_header = reviews_site.find("div", class_=re.compile(r'^sc-88e7efde-1'))
-                rating = int(metascore_header.text.strip())/10
-                movie.set_crit_avr_rating(rating)
-            except Exception as e:
-                self._errors += 1
-                print(f"[ERROR] Falha ao obter nota média de reviews de crítico na URL {crit_review_url}. Erro: {e}")
-
-            # encontra cada bloco de review
-            script_tag = reviews_site.find("script", type="application/json")
-            if script_tag:
-                data = json.loads(script_tag.string)
-                try :
-                    reviewCount = data['props']['pageProps']['contentData']['data']['title']['metacritic']["metascore"]["reviewCount"]
-                    int_review_count = int(reviewCount)
-                    movie.set_crit_rev_count(int_review_count)
+                try:
+                    metascore_header = reviews_site.find("div", class_=re.compile(r'^sc-88e7efde-1'))
+                    if metascore_header and metascore_header.text:
+                        rating = int(metascore_header.text.strip())/10
+                        movie.set_crit_avr_rating(rating)
                 except Exception as e:
                     self._errors += 1
-                    print(f"[ERROR] Falha ao obter quantidade de reviews de crítico na URL {crit_review_url}. Erro: {e}")
-                
-                try:
-                    reviews = data['props']['pageProps']['contentData']['data']['title']['metacritic']['reviews']['edges']
-                    for reviewContainer in reviews:
+                    print(f"[ERROR] Falha ao obter nota média de reviews de crítico na URL {crit_review_url}. Erro: {e}")
+
+                # encontra cada bloco de review
+                script_tag = reviews_site.find("script", type="application/json")
+                if script_tag:
+                    data = json.loads(script_tag.string)
+                    if data:
                         try:
-                            review = reviewContainer.get("node")
-                            # nota do crítico (pode estar em um span, strong ou outro elemento)
-                            rating = review["score"]
-                            rating_formatted = int(rating)/10 if rating else None
-                            text = (review["quote"]["value"]).strip()
-                            rev = Review()
-                            rev.set_rating(rating_formatted)
-                            rev.set_text(text)
-                            movie.add_critic_review(rev)
+                            metacritic = (
+                                data.get('props', {})
+                                    .get('pageProps', {})
+                                    .get('contentData', {})
+                                    .get('data', {})
+                                    .get('title', {})
+                                    .get('metacritic', {})
+                            )
+                            reviewCount = metacritic.get('metascore', {}).get('reviewCount') if metacritic else None
+                            if reviewCount:
+                                int_review_count = int(reviewCount)
+                                movie.set_crit_rev_count(int_review_count)
                         except Exception as e:
                             self._errors += 1
-                            print(f"[ERROR] Falha ao obter uma review de crítico na URL {crit_review_url}. Erro: {e}")
-                except Exception as e:
-                    self._errors += 1
-                    print(f"[ERROR] Falha ao obter reviews de crítico na URL {crit_review_url}. Erro: {e}")
+                            print(f"[ERROR] Falha ao obter quantidade de reviews de crítico na URL {crit_review_url}. Erro: {e}")
+                        
+                        try:
+                            metacritic = (
+                                data.get('props', {})
+                                    .get('pageProps', {})
+                                    .get('contentData', {})
+                                    .get('data', {})
+                                    .get('title', {})
+                                    .get('metacritic', {})
+                            )
+                            reviews = metacritic.get('reviews', {}).get('edges') if metacritic else None
+                            if reviews:
+                                for reviewContainer in reviews:
+                                    try:
+                                        review = reviewContainer.get("node")
+                                        if review:
+                                            # nota do crítico (pode estar em um span, strong ou outro elemento)
+                                            rating = review["score"]
+                                            rating_formatted = int(rating)/10 if rating else None
+                                            text = (review["quote"]["value"]).strip() if review["quote"]["value"] else None
+                                            if text or rating_formatted:
+                                                rev = Review()
+                                                rev.set_rating(rating_formatted)
+                                                rev.set_text(text)
+                                                movie.add_critic_review(rev)
+                                    except Exception as e:
+                                        self._errors += 1
+                                        print(f"[ERROR] Falha ao obter uma review de crítico na URL {crit_review_url}. Erro: {e}")
+                        except Exception as e:
+                            self._errors += 1
+                            print(f"[ERROR] Falha ao obter reviews de crítico na URL {crit_review_url}. Erro: {e}")
         except Exception as e:
             self._errors += 1
             print(f"[ERROR] Falha ao obter ou processar reviews de críticos na URL {crit_review_url}. Erro: {e}")
@@ -302,13 +335,15 @@ class IMDBScraper(Scraper):
         options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                   "AppleWebKit/537.36 (KHTML, like Gecko) "
                   "Chrome/120.0.0.0 Safari/537.36")
+        options.add_argument("--lang=en-US")
         options.add_argument("--headless")  # roda sem abrir janela
 
+        plataform_names = []
         try:
             service = Service()
             service.startup_timeout = 20
             driver = webdriver.Chrome(service=service, options=options)
-            driver.set_page_load_timeout(20) 
+            driver.set_page_load_timeout(30) 
             try:
                 driver.get(url.get_url())
                 time.sleep(2)  # espera carregar o conteúdo dinâmico
@@ -323,8 +358,11 @@ class IMDBScraper(Scraper):
                     href = link.get_attribute("href")  # URL do streaming
                     
                     try:
-                        plat = Plataform(plataform=label[label.find("on") + 3:], link=href)
-                        movie.add_platform(plat)
+                        name = label[label.find("on") + 3:]
+                        if name and name not in plataform_names:
+                            plat = Plataform(plataform=name, link=href)
+                            movie.add_platform(plat)
+                            plataform_names.append(name)
                     except Exception as e:
                         self._errors += 1
                         print(f"[ERROR] Falha ao processar uma plataforma de streaming da URL {url.get_url()}. Erro: {e}")

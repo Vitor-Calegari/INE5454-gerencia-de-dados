@@ -21,9 +21,12 @@ class LettrScraper(Scraper):
     def __init__(self, periodic_queue, storage: Storage):
         super().__init__(periodic_queue, storage)
         self.headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/126.0.0.0 Safari/537.36"
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/126.0.0.0 Safari/537.36"
+            ),
+            "Accept-Language": "en-US,en;q=0.9",
         }
         self.count = 0
         self.name = "Letterboxd"
@@ -104,7 +107,8 @@ class LettrScraper(Scraper):
                 with sync_playwright() as p:
 
                     browser = p.chromium.launch(headless=True)
-                    page = browser.new_page()
+                    context = browser.new_context(extra_http_headers=self.headers)
+                    page = context.new_page()
 
                     try:
                         page.goto(url.get_url(), wait_until="domcontentloaded")
@@ -153,7 +157,7 @@ class LettrScraper(Scraper):
             try:
                 title = details.find("span", {"class": "name js-widont prettify"}).text
             except Exception:
-                pass
+                return title, director_names
             try:
                 directors = details.find_all("a", class_="contributor")
                 if directors:
@@ -170,13 +174,15 @@ class LettrScraper(Scraper):
             if script_tag and script_tag.string:
 
                 raw = script_tag.string.strip()
-
-                # Remove comentários CDATA
-                raw = raw.replace("/* <![CDATA[ */", "").replace("/* ]]> */", "").strip()
-
-                data = json.loads(raw)
-                if data:
-                    link = data.get("image").strip()
+                if raw:
+                    # Remove comentários CDATA
+                    without_cdata = raw.replace("/* <![CDATA[ */", "").replace("/* ]]> */", "").strip()
+                    if without_cdata:
+                        data = json.loads(without_cdata)
+                        if data:
+                            img = data.get("image")
+                            if img:
+                                link = img.strip()
         except Exception as e:
             self._errors += 1
             print(f"[ERROR] Falha ao obter o link do poster na URL {url_str}. Erro: {e}")
@@ -187,7 +193,11 @@ class LettrScraper(Scraper):
         try:
             synopsis_section = site.find("section", {"class": "production-synopsis"})
             if synopsis_section:
-                synopsis = synopsis_section.find("p").text.strip()
+                synopsis_p = synopsis_section.find("p")
+                if synopsis_p:
+                    synopsis_text = synopsis_p.text
+                    if synopsis_text:
+                        synopsis = synopsis_text.strip()
         except Exception as e:
             self._errors += 1
             print(f"[ERROR] Falha ao obter a sinopse na URL {url_str}. Erro: {e}")
@@ -264,7 +274,7 @@ class LettrScraper(Scraper):
                 hour = lenght // 60
                 mins = lenght % 60
                 lenght_format = f"{hour:02d}:{mins:02d}:00"
-        except:
+        except Exception as e:
             self._errors += 1
             print(f"[ERROR] Falha ao obter duração na URL {url_str}. Erro: {e}")
         return lenght_format
@@ -296,10 +306,10 @@ class LettrScraper(Scraper):
             section = page.locator("section.ratings-histogram-chart")
             if section:
                 avg_rating_sec = section.locator("span.average-rating a")
-                if avg_rating_sec:
-                    avg_rating = avg_rating_sec.get_attribute(
-                        "data-original-title"
-                    )
+                try:
+                    avg_rating_sec.wait_for(timeout=5000)  # espera até 5s
+                    avg_rating = avg_rating_sec.get_attribute("data-original-title")
+                
                     if avg_rating:
                         numbers = re.findall(r"[\d,]+\.\d+|[\d,]+", avg_rating)
                         try:
@@ -313,6 +323,8 @@ class LettrScraper(Scraper):
                         except Exception as e:
                             self._errors += 1
                             print(f"[ERROR] Falha ao processar a nota média de usuários em {url_str}. Erro: {e}")
+                except Exception:
+                    pass # nao tem ou nao carregou em 5s
         except Exception as e:
             self._errors += 1
             print(f"[ERROR] Falha ao obter quantidade e nota média das reviews usuários em {url_str}. Erro: {e}")
@@ -321,6 +333,7 @@ class LettrScraper(Scraper):
         
     # --> Dinâmico
     def get_plataforms(self, page, url_str):
+        plataform_names = []
         plataforms = []
         try:
             div = page.locator("section.services.-showall")
@@ -344,8 +357,9 @@ class LettrScraper(Scraper):
                                 platform_name = "Paramount+"
                                 
                             platform_link = service.locator("a.label").get_attribute("href").strip()
-                            if platform_name and platform_link:
+                            if platform_name and platform_link and platform_name not in plataform_names:
                                 plataforms.append(Plataform(platform_name, platform_link))
+                                plataform_names.append(platform_name)
                         except Exception as e:
                             self._errors += 1
                             print(f"[ERROR] Falha ao processar uma plataforma de streaming em {url_str}. Erro: {e}")
