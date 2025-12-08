@@ -274,7 +274,7 @@ class LettrScraper(Scraper):
                 hour = lenght // 60
                 mins = lenght % 60
                 lenght_format = f"{hour:02d}:{mins:02d}:00"
-        except:
+        except Exception as e:
             self._errors += 1
             print(f"[ERROR] Falha ao obter duração na URL {url_str}. Erro: {e}")
         return lenght_format

@@ -25,13 +25,18 @@ class Movie:
         self.usr_reviews = []
         self.usr_rev_count = None
         self.poster_link = None
+
+        self.usr_avr_ratings = []
+        self.usr_avr_recommendations = []
+        self.crit_avr_ratings = []
+        self.crit_avr_recommendations = []
     
     # Overloaded ==
     def __eq__(self, other) -> bool:
         if not isinstance(other, Movie):
             return NotImplemented
         similarity = fuzz.ratio(self.title.lower(), other.title.lower())
-        limiar = 0.8
+        limiar = 80
         return similarity >= limiar
     
     def __ne__(self, other):
@@ -39,63 +44,140 @@ class Movie:
             return NotImplemented
         return not self.__eq__(other)
     
+    def similar(self, a, b):
+        similarity = fuzz.ratio(a.lower(), b.lower())
+        limiar = 80
+        return similarity >= limiar
+    
     def unite(self, other):
         if not isinstance(other, Movie):
             return NotImplemented
         
-        movie = Movie()
+        # urls
+        self.add_url(other.get_url()[0])
         
-        movie.set_title(self.title)
-        
-        movie.set_url([self.url])
-        for url in other.get_url():
-            movie.add_url(url)
-        
-        movie.set_genres(self.genres)
-        for genre in other.get_genres():
-            movie.add_genre(genre)
+        # genres
+        for genre_other in other.get_genres():
+            exists = False
+            for genre_self in self.get_genres():
+                if self.similar(genre_self, genre_other):
+                    exists = True
+                    break
+            if not exists:
+                self.add_genre(genre_other)
 
-        format = "%Y-%m-%d"  # TODO definir formato correto
-        
+        # realease dates
+        format = "%Y-%m-%d"
         release_date_t = pd.to_datetime([self.get_release_date(), other.get_release_date()], format=format, errors="coerce")
-        movie.set_release_date(release_date_t.min())
-        
-        if len(self.get_synopsis()) >= len(other.get_synopsis()):
-            movie.set_synopsis(self.get_synopsis())
+        min_date = release_date_t.min()
+        if pd.isna(min_date):
+            self.set_release_date(None)   # ou "", ou não setar
         else:
-            movie.set_synopsis(other.get_synopsis())
+            self.set_release_date(min_date.strftime("%Y-%m-%d"))
         
-        movie.set_length(self.get_length())
+        # synopsis
+        if self.get_synopsis() and other.get_synopsis():
+            if len(self.get_synopsis()) < len(other.get_synopsis()):
+                self.set_synopsis(other.get_synopsis())
+        elif not self.get_synopsis():
+            self.set_synopsis(other.get_synopsis())
+        else: 
+            self.set_synopsis(self.get_synopsis())
         
-        movie.set_directors(self.get_directors())              
+        # length
+        if self.get_length() and other.get_length():
+            if self.get_length() < other.get_length():
+                self.set_length(other.get_length())
+        elif not self.get_length():
+            self.set_length(other.get_length())
+        else:
+            self.set_length(self.get_length())
         
-        movie.set_cast(self.get_cast())
+        # directors
+        for director_other in other.get_directors():
+            exists = False
+            for director_self in self.get_directors():
+                if self.similar(director_self, director_other):
+                    exists = True
+                    break
+            if not exists:
+                self.add_director(director_other)           
         
-        movie.set_platforms(self.get_platforms())
+        # cast
+        for cast_other in other.get_cast():
+            exists = False
+            for cast_self in self.get_cast():
+                if self.similar(cast_self, cast_other):
+                    exists = True
+                    break
+            if not exists:
+                self.add_cast_member(cast_other) 
+        
+        # platforms
         for other_plat in other.get_platforms():
-            for movie_plat in movie.get_platforms():
-                if movie_plat != other:
-                    movie.add_platform(other_plat)
+            exists = False
+            for movie_plat in self.get_platforms():
+                if movie_plat == other_plat:
+                    exists = True
+                    break
+            if not exists:
+                self.add_platform(other_plat)
         
-        movie.set_content_rating(self.get_content_rating())
+        # content rating
+        if not self.get_content_rating():
+            self.set_content_rating(other.get_content_rating())
 
-        usr_avr_rating = (self.get_usr_avr_rating() + other.get_usr_avr_rating()) / 2
-        movie.set_usr_avr_rating(usr_avr_rating)
+        # user avr rating
+        if other.get_usr_avr_rating():
+            self.usr_avr_ratings.append(other.get_usr_avr_rating())
+        if self.usr_avr_ratings:
+            avg_usr_rating = sum(self.usr_avr_ratings) / len(self.usr_avr_ratings)
+            self.usr_avr_rating = avg_usr_rating
         
-        movie.set_usr_reviews(self.get_usr_reviews())
+        # user avr recommendation
+        if other.get_usr_avr_recommendation():
+            self.usr_avr_recommendations.append(other.get_usr_avr_recommendation())
+        if self.usr_avr_recommendations:
+            avg_usr_rec = sum(self.usr_avr_recommendations) / len(self.usr_avr_recommendations)
+            self.usr_avr_recommendation = avg_usr_rec
+        
+        # user reviews
         for review in other.get_usr_reviews():
-            movie.add_user_review(review)
-        movie.set_usr_rev_count(self.get_usr_reviews_count() + other.get_usr_reviews_count())
-        
-        crit_avr_rating = (self.get_crit_avr_rating() + other.get_crit_reviews()) / 2
-        movie.set_crit_avr_rating(crit_avr_rating)
-        
-        movie.set_crit_reviews(self.get_crit_reviews())
-        for review in other.get_crit_reviews():
-            movie.add_critic_review(review)
-        movie.set_crit_rev_count(self.get_crit_reviews_count() + other.get_crit_reviews_count())
+            self.add_user_review(review)
 
-        return movie
+        # user reviews count
+        if self.get_usr_reviews_count() and other.get_usr_reviews_count():
+            self.set_usr_rev_count(self.get_usr_reviews_count() + other.get_usr_reviews_count())
+        elif not self.get_usr_reviews_count():
+            self.set_usr_rev_count(other.get_usr_reviews_count())
+        
+        # crit avr rating
+        if other.get_crit_avr_rating():
+            self.crit_avr_ratings.append(other.get_crit_avr_rating())
+        if self.crit_avr_ratings:
+            avg_crit_rating = sum(self.crit_avr_ratings) / len(self.crit_avr_ratings)
+            self.crit_avr_rating = avg_crit_rating
+        
+        # crit avr recommendation
+        if other.get_crit_avr_recommendation():
+            self.crit_avr_recommendations.append(other.get_crit_avr_recommendation())
+        if self.crit_avr_recommendations:
+            avg_crit_rec = sum(self.crit_avr_recommendations) / len(self.crit_avr_recommendations)
+            self.crit_avr_recommendation = avg_crit_rec
+        
+        # crit reviews
+        for review in other.get_crit_reviews():
+            self.add_critic_review(review)
+
+        # crit reviews count
+        if self.get_crit_reviews_count() and other.get_crit_reviews_count():
+            self.set_crit_rev_count(self.get_crit_reviews_count() + other.get_crit_reviews_count())
+        elif not self.get_crit_reviews_count():
+            self.set_crit_rev_count(other.get_crit_reviews_count())
+        
+        # poster link
+        if not self.get_poster_link():
+            self.set_poster_link(other.get_poster_link())
        
     # Getters -----------------------
     def get_title(self) -> str | None:
@@ -161,7 +243,10 @@ class Movie:
         self.title = title
 
     def set_url(self, url: list[str]) -> None:
-        self.url = url
+        if type(url) != list:
+            self.url = [url]
+        else:
+            self.url = url
     
     def set_genres(self, genres: list) -> None:
         self.genres = genres
@@ -188,6 +273,8 @@ class Movie:
         self.content_rating = content_rating
     
     def set_crit_avr_rating(self, rating: float) -> None:
+        if rating:
+            self.crit_avr_ratings.append(rating)
         self.crit_avr_rating = rating
     
     def set_crit_reviews(self, reviews: list) -> None:
@@ -197,9 +284,13 @@ class Movie:
         self.crit_rev_count = reviews_count
     
     def set_crit_avr_recommendation(self, recommendation) -> None:
+        if recommendation:
+            self.crit_avr_recommendations.append(recommendation)
         self.crit_avr_recommendation = recommendation
     
     def set_usr_avr_rating(self, rating: float) -> None:
+        if rating:
+            self.usr_avr_ratings.append(rating)
         self.usr_avr_rating = rating
     
     def set_usr_reviews(self, reviews: list) -> None:
@@ -209,6 +300,8 @@ class Movie:
         self.usr_rev_count = reviews_count
     
     def set_usr_avr_recommendation(self, recommendation) -> None:
+        if recommendation:
+            self.usr_avr_recommendations.append(recommendation)
         self.usr_avr_recommendation = recommendation
     
     def set_poster_link(self, poster) -> None:

@@ -151,7 +151,8 @@ class IMDBScraper(Scraper):
         try:
             # Encontra o bloco onde o rótulo é "Directors"
             directors_section = site.find("span", string="Directors")
-
+            if not directors_section:
+                directors_section = site.find("span", string="Director")
             if directors_section:
                 # Pega o container logo após o span
                 container = directors_section.find_next(
