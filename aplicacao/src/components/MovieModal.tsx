@@ -13,19 +13,24 @@ interface MovieModalProps {
   onClose: () => void;
 }
 
-const getSiteName = (link: string): string => {
+const getSiteName = (link?: string | null): string => {
+  if (!link) return "Outro";
   if (link.includes("imdb")) return "IMDb";
   if (link.includes("rottentomatoes")) return "Rotten Tomatoes";
   if (link.includes("letterboxd")) return "Letterboxd";
   return "Outro";
 };
 
-const getSiteColor = (link: string): string => {
+
+const getSiteColor = (link?: string | null): string => {
+  if (!link) return "bg-muted text-muted-foreground"; // fallback seguro
+
   if (link.includes("imdb")) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
   if (link.includes("rottentomatoes")) return "bg-red-500/20 text-red-400 border-red-500/30";
   if (link.includes("letterboxd")) return "bg-orange-500/20 text-orange-400 border-orange-500/30";
   return "bg-muted text-muted-foreground";
 };
+
 
 interface RatingsBreakdownProps {
   title: string;
@@ -45,7 +50,17 @@ const RatingsBreakdown = ({ title, average, notes, taxas, quantidades }: Ratings
       {/* Média geral */}
       <div className="flex items-center gap-2 mb-4">
         <Star className="h-6 w-6 fill-primary text-primary" />
-        <span className="text-2xl font-bold text-foreground">{average.toFixed(1)}</span>
+        {typeof average === "number" ? (
+          <>
+            <span className="text-2xl font-bold text-foreground">
+              {average.toFixed(1)}
+            </span>
+            <span className="text-muted-foreground">/10</span>
+          </>
+        ) : (
+          <span className="text-sm text-muted-foreground">No rating available</span>
+        )}
+
         <span className="text-muted-foreground">/10</span>
         {hasSingleSource && (
           <span className="text-sm text-muted-foreground ml-2">
@@ -116,46 +131,65 @@ interface ReviewsListProps {
   maxReviews?: number;
 }
 
-const ReviewsList = ({ reviews, maxReviews = reviews.length }: ReviewsListProps) => {
-  const validReviews = reviews.filter((r) => r.texto);
-  
+const ReviewsList = ({ reviews, maxReviews = reviews?.length || 0 }: ReviewsListProps) => {
+  const safeReviews = Array.isArray(reviews) ? reviews : [];
+
+  const validReviews = safeReviews.filter((r) => r?.texto);
+
   if (validReviews.length === 0) {
     return <p className="text-muted-foreground text-sm">No reviews available.</p>;
   }
 
   return (
     <div className="space-y-4">
-      {validReviews.slice(0, maxReviews).map((review, index) => (
-        <div
-          key={index}
-          className="p-4 rounded-xl bg-secondary/50 border border-border"
-        >
-          <div className="flex items-center justify-between gap-3 mb-2">
-            <div className="flex items-center gap-2">
-              {review["avaliação (nota até 10)"] && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-primary/20 rounded-lg">
-                  <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-                  <span className="text-sm font-semibold text-primary">
-                    {review["avaliação (nota até 10)"].toFixed(1)}
-                  </span>
-                </div>
-              )}
-              {review.data && (
-                <span className="text-xs text-muted-foreground">{review.data}</span>
+      {validReviews.slice(0, maxReviews).map((review, index) => {
+        const safeNota = typeof review["avaliação (nota até 10)"] === "number"
+          ? review["avaliação (nota até 10)"]
+          : null;
+
+        return (
+          <div
+            key={index}
+            className="p-4 rounded-xl bg-secondary/50 border border-border"
+          >
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <div className="flex items-center gap-2">
+
+                {/* Nota */}
+                {safeNota !== null && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/20 rounded-lg">
+                    <Star className="h-3.5 w-3.5 fill-primary text-primary" />
+                    <span className="text-sm font-semibold text-primary">
+                      {safeNota.toFixed(1)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Data */}
+                {review?.data && (
+                  <span className="text-xs text-muted-foreground">{review.data}</span>
+                )}
+              </div>
+
+              {/* Site */}
+              {review?.link && (
+                <Badge variant="outline" className={`text-xs ${getSiteColor(review.link)}`}>
+                  {getSiteName(review.link)}
+                </Badge>
               )}
             </div>
-            <Badge variant="outline" className={`text-xs ${getSiteColor(review.link)}`}>
-              {getSiteName(review.link)}
-            </Badge>
+
+            {/* Texto da review */}
+            <p className="text-sm text-foreground/90 leading-relaxed italic">
+              "{review.texto}"
+            </p>
           </div>
-          <p className="text-sm text-foreground/90 leading-relaxed italic">
-            "{review.texto}"
-          </p>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
+
 
 const MovieModal = ({ movie, isOpen, onClose }: MovieModalProps) => {
   if (!movie) return null;
@@ -242,25 +276,43 @@ const MovieModal = ({ movie, isOpen, onClose }: MovieModalProps) => {
                   </h2>
                   
                   <div className="flex flex-wrap items-center gap-3 mb-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {year}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {formatDuration(movie.duracao)}
-                    </span>
-                    <Badge variant="outline" className="border-primary/50 text-primary">
-                      {movie["classificacao indicativa"]}
-                    </Badge>
+                    {/* Ano */}
+                    {year && (
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        {year}
+                      </span>
+                    )}
+
+                    {/* Duração */}
+                    {movie?.duracao && (
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {formatDuration(movie.duracao)}
+                      </span>
+                    )}
+
+                    {/* Classificação indicativa */}
+                    {movie?.["classificacao indicativa"] && (
+                      <Badge variant="outline" className="border-primary/50 text-primary">
+                        {movie["classificacao indicativa"]}
+                      </Badge>
+                    )}
                   </div>
 
+
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {movie.generos.map((genre) => (
-                      <Badge key={genre} variant="secondary" className="bg-secondary text-secondary-foreground">
-                        {genre}
-                      </Badge>
-                    ))}
+                    {Array.isArray(movie?.generos) &&
+                      movie.generos.length > 0 &&
+                      movie.generos.map((genre) => (
+                        <Badge
+                          key={genre}
+                          variant="secondary"
+                          className="bg-secondary text-secondary-foreground"
+                        >
+                          {genre}
+                        </Badge>
+                      ))}
                   </div>
 
                   {/* Quick Ratings */}
@@ -294,7 +346,9 @@ const MovieModal = ({ movie, isOpen, onClose }: MovieModalProps) => {
             {/* Synopsis */}
             <section>
               <h3 className="font-display text-xl text-foreground mb-3">Synopsis</h3>
-              <p className="text-muted-foreground leading-relaxed">{movie.sinopse}</p>
+              {movie?.sinopse && (
+                <p className="text-muted-foreground leading-relaxed">{movie.sinopse}</p>
+              )}
             </section>
 
             {/* Director & Cast */}
@@ -304,16 +358,28 @@ const MovieModal = ({ movie, isOpen, onClose }: MovieModalProps) => {
                   <Film className="h-5 w-5 text-primary" />
                   Directors
                 </h3>
-                <p className="text-muted-foreground">{movie.diretor.join(", ")}</p>
+
+                {Array.isArray(movie?.diretor) && movie.diretor.length > 0 && (
+                  <p className="text-muted-foreground">
+                    {movie.diretor.join(", ")}
+                  </p>
+                )}
               </div>
+
               <div>
                 <h3 className="font-display text-xl text-foreground mb-3 flex items-center gap-2">
                   <Users className="h-5 w-5 text-primary" />
                   Cast
                 </h3>
-                <p className="text-muted-foreground">{movie.elenco.join(", ")}</p>
+
+                {Array.isArray(movie?.elenco) && movie.elenco.length > 0 && (
+                  <p className="text-muted-foreground">
+                    {movie.elenco.join(", ")}
+                  </p>
+                )}
               </div>
             </section>
+
 
             {/* Ratings Breakdown */}
             <section>
@@ -367,21 +433,26 @@ const MovieModal = ({ movie, isOpen, onClose }: MovieModalProps) => {
                 <MessageSquare className="h-5 w-5 text-primary" />
                 Reviews
               </h3>
+
               <Tabs defaultValue="critics" className="w-full">
                 <TabsList className="mb-4">
                   <TabsTrigger value="critics">
-                    Critics ({criticReviews.filter(r => r.texto).length})
+                    Critics ({Array.isArray(criticReviews) ? criticReviews.filter(r => r?.texto).length : 0})
                   </TabsTrigger>
+
                   <TabsTrigger value="users">
-                    Users ({userReviews.filter(r => r.texto).length})
+                    Users ({Array.isArray(userReviews) ? userReviews.filter(r => r?.texto).length : 0})
                   </TabsTrigger>
                 </TabsList>
+
                 <TabsContent value="critics">
-                  <ReviewsList reviews={criticReviews} />
+                  <ReviewsList reviews={Array.isArray(criticReviews) ? criticReviews : []} />
                 </TabsContent>
+
                 <TabsContent value="users">
-                  <ReviewsList reviews={userReviews} />
+                  <ReviewsList reviews={Array.isArray(userReviews) ? userReviews : []} />
                 </TabsContent>
+
               </Tabs>
             </section>
 
