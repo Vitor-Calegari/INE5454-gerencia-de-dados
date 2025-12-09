@@ -26,6 +26,9 @@ class Review:
 
     def set_date(self, date: str):
         self.date = date
+    
+    def set_link(self, link: str):
+        self.link = link
 
     def __str__(self):
         return f"Rating: {self.rating},\n\

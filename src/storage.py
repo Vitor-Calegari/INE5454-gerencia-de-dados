@@ -7,7 +7,7 @@ from pathlib import Path
 
 class Storage(Observed):
     
-    def __init__(self, threshold: int = 1500) -> None:
+    def __init__(self, threshold: int = 30) -> None:
         super().__init__()
         self.scrapers = {}
         self.threshold = threshold
@@ -99,6 +99,21 @@ class Storage(Observed):
             for outer_type_key, unprocessed_movies in self.scrapers.items():
                 if first:
                     for unprocessed_movie in unprocessed_movies:
+                        rev = unprocessed_movie.get_crit_reviews()
+                        url_rev = unprocessed_movie.get_url()[0]
+                        new_rev = []
+                        for r in rev:
+                            r.set_link(url_rev)
+                            new_rev.append(r)
+                        unprocessed_movie.set_crit_reviews(new_rev)
+                        rev = unprocessed_movie.get_usr_reviews()
+                        url_rev = unprocessed_movie.get_url()[0]
+                        new_rev = []
+                        for r in rev:
+                            r.set_link(url_rev)
+                            new_rev.append(r)
+                        unprocessed_movie.set_usr_reviews(new_rev)
+                        
                         processed_movies.append(unprocessed_movie)
                     first = False
                 else:
@@ -111,6 +126,20 @@ class Storage(Observed):
                                 equal = True
                                 break
                         if not equal:
+                            rev = unprocessed_movie.get_crit_reviews()
+                            url_rev = unprocessed_movie.get_url()[0]
+                            new_rev = []
+                            for r in rev:
+                                r.set_link(url_rev)
+                                new_rev.append(r)
+                            unprocessed_movie.set_crit_reviews(new_rev)
+                            rev = unprocessed_movie.get_usr_reviews()
+                            url_rev = unprocessed_movie.get_url()[0]
+                            new_rev = []
+                            for r in rev:
+                                r.set_link(url_rev)
+                                new_rev.append(r)
+                            unprocessed_movie.set_usr_reviews(new_rev)
                             new_movies.append(unprocessed_movie)
                     processed_movies.extend(new_movies)
 
