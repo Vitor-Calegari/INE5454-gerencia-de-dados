@@ -61,7 +61,6 @@ const RatingsBreakdown = ({ title, average, notes, taxas, quantidades }: Ratings
           <span className="text-sm text-muted-foreground">No rating available</span>
         )}
 
-        <span className="text-muted-foreground">/10</span>
         {hasSingleSource && (
           <span className="text-sm text-muted-foreground ml-2">
             (via {getSiteName(notes[0].link)})
